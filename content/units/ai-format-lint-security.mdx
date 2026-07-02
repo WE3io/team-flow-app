@@ -1,0 +1,52 @@
+---
+id: ai-format-lint-security
+title: Three different safety nets (and why Prettier isn't enough)
+type: concept
+tier: all
+level: 2
+topics:
+  - ai-code
+  - tooling
+  - safety
+format: carousel
+collection: ai-tools
+prereqs:
+  - sh-ai-tools
+related:
+  - rev-preview-limits
+  - eng-pipeline
+order: 12
+hook: >-
+  "The formatter passed" tells you nothing about whether the code is safe.
+  They're different jobs.
+carousel:
+  - heading: Formatting
+    body: >-
+      (Prettier) — makes code *look* consistent. Spacing and style only. Zero to
+      do with whether it works or is safe.
+  - heading: Linting & types
+    body: >-
+      (ESLint, TypeScript) — catches *bugs*: dead code, unsafe patterns, type
+      mismatches.
+  - heading: Security scanning
+    body: >-
+      catches *danger*: leaked secrets, known vulnerabilities, dodgy or
+      hallucinated dependencies.
+  - heading: The point
+    body: >-
+      a tidy-looking file can be buggy and insecure. Our pipeline runs all three
+      so you don't have to hold it in your head.
+visual: 'Three nets stacked, each catching a different shape falling through.'
+next: '`ai-secrets`.'
+prompt: Your AI tool's code passed the formatter (Prettier). Is it safe to ship?
+answer: >-
+  No — formatting only makes code *look* consistent. Safety needs linting/types
+  (for bugs) and security scanning (for vulnerabilities, secrets, bad
+  dependencies). Three different nets.
+distractors:
+  - Yes — a passing formatter means the code is clean
+  - Yes — if it's formatted and it renders in the preview
+misconception: '"A tidy, well-formatted file is a safe file."'
+---
+
+People conflate these three. They catch completely different problems, and you need all three.

@@ -1,0 +1,25 @@
+---
+id: eng-ghcr
+title: 'Build once, scan, then deploy the artefact'
+type: concept
+tier: engineer
+level: 3
+topics:
+  - ci
+  - deploy
+  - registry
+format: card
+collection: engineers
+prereqs:
+  - eng-pipeline
+related:
+  - eng-coolify-singleimage
+order: 20
+hook: >-
+  Build in CI and have Coolify *pull* the image — don't build on the production
+  box.
+visual: Actions → scan → GHCR → Coolify pull. Build never touches the prod server.
+next: '`eng-coolify-singleimage`.'
+---
+
+GitHub Packages is GHCR. We build the image in GitHub Actions, scan it, push it to `ghcr.io`, and Coolify deploys by pulling that prebuilt image. Two reasons: you scan the exact artefact you ship (rebuilding on the server would ship something you didn't scan), and you keep heavy build load off the VPS (builds can and do crash small boxes). One-time setup gotcha: the server needs `docker login ghcr.io` with a PAT to pull private images, or the pull fails with `unauthorized`.

@@ -1,0 +1,30 @@
+---
+id: ai-small
+title: Keep AI changes small enough to check
+type: guardrail
+tier: all
+level: 2
+topics:
+  - ai-code
+  - pr-review
+format: card
+collection: ai-tools
+prereqs:
+  - sh-ai-tools
+related:
+  - flow-pr
+  - sh-golden-rules
+order: 14
+hook: >-
+  AI can generate 500 lines in a second. Nobody can review 500 lines properly in
+  a second.
+visual: 'Two PRs side by side — a tidy 30-line one, ticked; a 600-line wall, flagged.'
+next: |-
+  `rev-preview-limits`.
+
+  ---
+
+  ### Collection: When Git Breaks
+---
+
+The faster the tool, the smaller your pull requests should be. A huge AI-generated change is a change nobody truly reviewed — the exact way messy or unsafe code slips into `main`. Break work into small pieces, each its own PR. Small is reviewable; reviewable is safe.

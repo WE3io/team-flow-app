@@ -1,0 +1,42 @@
+---
+id: rev-preview-limits
+title: What a preview shows — and what it hides
+type: concept
+tier: all
+level: 2
+topics:
+  - pr-review
+  - previews
+  - ai-code
+  - safety
+format: carousel
+collection: reviewing
+prereqs:
+  - flow-preview
+related:
+  - ai-secrets
+  - ai-format-lint-security
+order: 10
+hook: >-
+  "It looked fine in the preview" is not the same as "it's safe to merge."
+  Here's the gap.
+carousel:
+  - heading: A preview shows
+    body: >-
+      the UI, the copy, the layout, the click-through. Judge these with
+      confidence.
+  - heading: A preview hides
+    body: secrets accidentally left in the code.
+  - heading: A preview hides
+    body: security holes — a page can render perfectly and still be unsafe.
+  - heading: A preview hides
+    body: 'logic that breaks off the happy path, or a dodgy dependency.'
+  - heading: So
+    body: >-
+      you judge the experience; the automated checks and an engineer judge the
+      rest. Both matter.
+visual: 'Split card — glossy UI on one side, an iceberg of hidden risks below.'
+next: '`rev-who-to-tag`.'
+---
+
+A preview shows you the finished surface on the happy path. That's perfect for judging the experience — and blind to several things that can still be broken underneath.

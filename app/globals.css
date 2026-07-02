@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Hide scrollbars inside the phone surfaces without disabling scroll. */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ---------- Phone frame ---------- */
+.phone-frame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  background: #f6f1e4;
+  overflow: hidden;
+}
+.phone-island,
+.phone-home {
+  display: none;
+}
+.phone-statusbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px 6px;
+  flex: 0 0 auto;
+  background: #f6f1e4;
+}
+.phone-time {
+  font-size: 15px;
+  font-weight: 700;
+  color: #16150f;
+  letter-spacing: -0.2px;
+}
+.phone-status-icons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.phone-screen {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: #f6f1e4;
+  overflow: hidden;
+}
+
+/* On larger screens, show a centred device bezel. */
+@media (min-width: 480px) {
+  .phone-frame {
+    width: 402px;
+    height: min(880px, 94vh);
+    border-radius: 52px;
+    box-shadow:
+      0 40px 90px rgba(0, 0, 0, 0.22),
+      0 0 0 1px rgba(0, 0, 0, 0.1),
+      0 0 0 12px #1b1a15,
+      0 0 0 14px #2c2a22;
+  }
+  .phone-statusbar {
+    padding-top: 20px;
+  }
+  .phone-island {
+    display: block;
+    position: absolute;
+    top: 11px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 118px;
+    height: 34px;
+    border-radius: 20px;
+    background: #000;
+    z-index: 60;
+  }
+  .phone-home {
+    display: block;
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 132px;
+    height: 5px;
+    border-radius: 100px;
+    background: rgba(0, 0, 0, 0.22);
+    z-index: 60;
+    pointer-events: none;
+  }
+  .phone-screen {
+    padding-bottom: 14px;
+  }
+}

@@ -1,0 +1,9 @@
+# Keep the Vercel upload to the app itself — exclude the design handoff bundle
+# and docs (content is already generated into content/units/*.mdx).
+node_modules
+.next
+project
+chats
+README.md
+Team_Workflow_Learning_Seed_v0.2.md
+Platform_Build_Handoff_for_Claude_Code.md

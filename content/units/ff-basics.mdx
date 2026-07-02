@@ -1,0 +1,22 @@
+---
+id: ff-basics
+title: 'What a feature flag is, and our one rule'
+type: concept
+tier: product-design
+level: 3
+topics:
+  - feature-flags
+  - deploy
+format: card
+collection: feature-flags
+prereqs: []
+related:
+  - ff-knight
+  - glo-flag
+order: 17
+hook: A switch that turns a feature on or off without changing the code that's live.
+visual: 'A labelled toggle, "on for 10% of users."'
+next: '`ff-knight`.'
+---
+
+Feature flags let us merge unfinished work safely (hidden behind an "off" switch) and turn features on for some users, or off instantly if something's wrong (a "kill switch"). We use Unleash for this. Our one discipline: **one flag, one purpose, and delete it the moment the rollout is done.** Old flags left lying around are how accidents happen.

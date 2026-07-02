@@ -1,0 +1,29 @@
+---
+id: rev-who-to-tag
+title: Who needs to look at this?
+type: procedure
+tier: all
+level: 2
+topics:
+  - pr-review
+  - codeowners
+format: card
+collection: reviewing
+prereqs:
+  - rev-preview-limits
+related:
+  - flow-review-merge
+order: 11
+hook: >-
+  Content change? A peer can approve. Touches login, data, or money? An engineer
+  must.
+visual: A decision arrow — "what did you change?" → two paths.
+next: |-
+  `flow-review-merge`.
+
+  ---
+
+  ### Collection: Working with AI Tools
+---
+
+For copy, visuals and docs, a relevant teammate reviewing the preview is enough. For anything touching authentication, user data, payments, or server logic, an engineer has to review the code — the system routes these automatically to the right people (that's what CODEOWNERS does). If in doubt, tag an engineer; it's never wrong.

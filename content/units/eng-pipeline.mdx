@@ -1,0 +1,40 @@
+---
+id: eng-pipeline
+title: 'The pipeline, in order'
+type: procedure
+tier: engineer
+level: 3
+topics:
+  - ci
+  - deploy
+  - ai-code
+format: carousel
+collection: engineers
+prereqs: []
+related:
+  - eng-ghcr
+  - eng-coolify-singleimage
+  - ai-format-lint-security
+order: 19
+hook: >-
+  Gates first, deploy last. The deploy step only runs if everything before it is
+  green.
+carousel:
+  - heading: Lint & format
+    body: Biome or ESLint/Prettier. Style and obvious bugs.
+  - heading: Type-check
+    body: '`tsc`. No type errors reach `main`.'
+  - heading: Test
+    body: 'Vitest for units/components, Playwright for end-to-end.'
+  - heading: Build image
+    body: one Dockerfile per deployable app.
+  - heading: Scan image
+    body: 'Trivy: vulnerabilities, secrets, dependencies. Block on criticals.'
+  - heading: Push to GHCR
+    body: 'the scanned artefact, tagged.'
+  - heading: Deploy
+    body: trigger Coolify to pull that exact image. Never before the checks pass.
+visual: 'A seven-stage pipeline, each stage gating the next.'
+next: '`eng-ghcr`.'
+---
+

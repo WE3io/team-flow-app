@@ -1,0 +1,27 @@
+---
+id: ff-knight
+title: The $440 million flag
+type: antipattern
+tier: all
+level: 3
+topics:
+  - feature-flags
+  - safety
+format: card
+collection: feature-flags
+prereqs:
+  - ff-basics
+related:
+  - ff-basics
+order: 18
+hook: A single flag nobody cleaned up cost one firm $440 million in 45 minutes.
+visual: 'A stark timeline — 09:30 deploy → 10:15 catastrophe.'
+next: |-
+  `ff-basics`.
+
+  ---
+
+  ### Collection: For Engineers
+---
+
+In 2012, Knight Capital reused an old, un-retired feature flag for new code. When a deploy went out unevenly, that flag switched on long-dead code on some servers — and in about three-quarters of an hour it ran up roughly a $440M loss and effectively ended the company. The lesson isn't "flags are dangerous." It's "stale flags are dangerous." Retire them.

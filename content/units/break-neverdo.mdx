@@ -1,0 +1,43 @@
+---
+id: break-neverdo
+title: Commands to never run on a guess
+type: antipattern
+tier: all
+level: 2
+topics:
+  - git-breaks
+  - safety
+  - ai-code
+format: card
+collection: git-breaks
+prereqs:
+  - break-escalate
+related:
+  - sh-escalation
+order: 16
+hook: >-
+  If an AI tells you to run `git reset --hard` or `git push --force`, stop.
+  These destroy work.
+visual: 'Two commands with a bold ⛔, and "ask an engineer" as the green alternative.'
+next: |-
+  `sh-escalation`.
+
+  ---
+
+  ### Collection: Feature Flags
+prompt: >-
+  Git is in a mess and your AI assistant suggests running `git reset --hard`. Do
+  you run it?
+answer: >-
+  No. Stop and ping an engineer. That command permanently deletes work, and a
+  follow-up force-push can destroy teammates' work. Safe, reversible options
+  exist.
+distractors:
+  - Yes — the AI understands the error better than I do
+  - Yes — and push --force afterwards to make it stick
+misconception: >-
+  "An AI's suggested fix for a Git error is safe to run without understanding
+  it."
+---
+
+Pasting a Git error into an AI and running whatever it suggests is dangerous, because AIs readily suggest history-rewriting commands. `git reset --hard` permanently deletes changes; `git push --force` can wipe teammates' work off the shared branch. We've disabled force-push on protected branches so the worst can't happen by accident — but the habit still matters. Safe, reversible options exist (undo *with* a new change, set work aside, make a backup branch), and an engineer will pick the right one in seconds. When in doubt: ask, don't run.

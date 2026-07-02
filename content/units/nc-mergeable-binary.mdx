@@ -1,0 +1,45 @@
+---
+id: nc-mergeable-binary
+title: Text merges. Binaries don't.
+type: concept
+tier: product-design
+level: 2
+topics:
+  - non-code
+  - design
+  - git-basics
+format: carousel
+collection: non-code
+prereqs: []
+related:
+  - glo-conflict
+order: 22
+hook: >-
+  Git is brilliant with words and code, and hopeless with design binaries.
+  Here's the rule.
+carousel:
+  - heading: Mergeable
+    body: >-
+      Markdown, code, plain text. Two people can edit and Git combines it. Full
+      workflow applies.
+  - heading: Not mergeable
+    body: >-
+      `.fig`, `.psd`, `.sketch`, big images. Git can't merge or shrink them; two
+      edits just clobber each other.
+  - heading: So design source lives in Figma
+    body: >-
+      use Figma's own branching and version history. Only *exports* (SVG,
+      tokens, specs) go into Git.
+  - heading: And docs/research repos are lighter
+    body: >-
+      they need review, but no builds, previews, or deploy machinery. Match the
+      rigour to the repo's job.
+visual: Two columns — "Git loves this" / "keep this in Figma."
+next: |-
+  `glossary`.
+
+  ---
+
+  ### Collection: Glossary
+---
+

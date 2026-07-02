@@ -1,0 +1,25 @@
+---
+id: break-escalate
+title: The safe first move
+type: runbook
+tier: all
+level: 2
+topics:
+  - git-breaks
+  - safety
+format: card
+collection: git-breaks
+prereqs: []
+related:
+  - sh-escalation
+  - break-neverdo
+order: 15
+hook: 'Something''s gone wrong in Git. Do this, in order.'
+visual: 'Three-step card, calm palette.'
+next: '`break-neverdo`.'
+---
+
+1. **Stop.** Don't run more commands hoping to fix it.
+2. **Screenshot** the message.
+3. **Ping an engineer** with the screenshot and what you were doing.
+Your local mess almost never affects anyone else, and branch protection stops it reaching `main`. There is no rush and no shame. Asking is the correct, professional move.

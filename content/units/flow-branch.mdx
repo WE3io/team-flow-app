@@ -1,0 +1,29 @@
+---
+id: flow-branch
+title: Start a branch
+type: procedure
+tier: product-design
+level: 2
+topics:
+  - branching
+  - everyday-flow
+  - gui
+format: card
+collection: everyday-flow
+prereqs:
+  - sh-core-loop
+related:
+  - flow-commit
+  - glo-branch
+order: 5
+hook: Never work directly on `main`. Make a branch first — it's your safe sandbox.
+visual: Screenshot of the "New branch" dialog with the naming convention called out.
+next: '`flow-commit`.'
+prompt: You're about to start a new piece of work. What's the very first thing you do?
+answer: >-
+  Pull the latest `main`, then create a short-lived branch named
+  `your-initials/description`. You never work on `main` directly.
+misconception: '"Small changes can go straight onto `main` to save time."'
+---
+
+In GitHub Desktop or your editor's Git panel, pull the latest `main`, then create a branch named `your-initials/what-you're-doing` — e.g. `sk/hero-redesign`. Everything you do now is isolated until you choose to share it. Use the buttons; you don't need the command line.

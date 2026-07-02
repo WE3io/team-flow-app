@@ -1,0 +1,76 @@
+[
+  {
+    "id": "start-here",
+    "title": "Start Here",
+    "tier": [
+      "all"
+    ],
+    "order": 1
+  },
+  {
+    "id": "everyday-flow",
+    "title": "The Everyday Flow",
+    "tier": [
+      "product-design",
+      "all"
+    ],
+    "order": 2
+  },
+  {
+    "id": "reviewing",
+    "title": "Reviewing Well",
+    "tier": [
+      "all"
+    ],
+    "order": 3
+  },
+  {
+    "id": "ai-tools",
+    "title": "Working with AI Tools",
+    "tier": [
+      "all"
+    ],
+    "order": 4
+  },
+  {
+    "id": "git-breaks",
+    "title": "When Git Breaks",
+    "tier": [
+      "all"
+    ],
+    "order": 5
+  },
+  {
+    "id": "feature-flags",
+    "title": "Feature Flags",
+    "tier": [
+      "product-design",
+      "engineer"
+    ],
+    "order": 6
+  },
+  {
+    "id": "engineers",
+    "title": "For Engineers",
+    "tier": [
+      "engineer"
+    ],
+    "order": 7
+  },
+  {
+    "id": "non-code",
+    "title": "Non-Code & Design Work",
+    "tier": [
+      "product-design"
+    ],
+    "order": 8
+  },
+  {
+    "id": "glossary",
+    "title": "Glossary",
+    "tier": [
+      "all"
+    ],
+    "order": 9
+  }
+]
