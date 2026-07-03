@@ -18,7 +18,8 @@ export default function BottomNav({ tab, onTab }: { tab: TabKey; onTab: (t: TabK
         display: 'flex',
         borderTop: `1px solid ${tokens.hairline}`,
         background: '#FFFFFF',
-        padding: '10px 8px 6px',
+        // Bottom safe-area padding: the phone frame used to provide this gap.
+        padding: '10px 8px calc(6px + env(safe-area-inset-bottom, 0px))',
         flex: '0 0 auto',
       }}
     >
