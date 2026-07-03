@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import type { Tier, UnitType } from './types';
 
 /**
@@ -60,3 +61,19 @@ const TIER_LABEL: Record<Tier, string> = {
 export function tierLabel(t: Tier): string {
   return TIER_LABEL[t] ?? t;
 }
+
+/**
+ * Neutral reset so real <button> elements can carry the design system's
+ * inline styles without browser chrome (a11y: interactive things are buttons).
+ */
+export const buttonReset: CSSProperties = {
+  appearance: 'none',
+  background: 'none',
+  border: 'none',
+  margin: 0,
+  padding: 0,
+  font: 'inherit',
+  color: 'inherit',
+  textAlign: 'inherit',
+  cursor: 'pointer',
+};

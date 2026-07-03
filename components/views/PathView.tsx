@@ -1,6 +1,6 @@
 'use client';
 import { isStepDone, type Progress, pathUnits } from '@/lib/scheduler';
-import { tierLabel, tokens } from '@/lib/theme';
+import { buttonReset, tierLabel, tokens } from '@/lib/theme';
 import type { Unit } from '@/lib/types';
 
 /**
@@ -73,14 +73,17 @@ export default function PathView({
           const upNext = !done && firstUndone === i;
           const isLastStep = i === steps.length - 1;
           return (
-            <div
+            <button
+              type="button"
               key={u.id}
               onClick={() => openDetail(u.id)}
               style={{
+                ...buttonReset,
                 display: 'flex',
                 alignItems: 'stretch',
                 gap: 12,
-                cursor: 'pointer',
+                width: '100%',
+                textAlign: 'left',
               }}
             >
               <div
@@ -166,7 +169,7 @@ export default function PathView({
                   {u.type} · level {u.level} · {tierLabel(u.tier)}
                 </span>
               </div>
-            </div>
+            </button>
           );
         })}
       </div>

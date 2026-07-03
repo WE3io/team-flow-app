@@ -1,11 +1,11 @@
 'use client';
 import type { Progress } from '@/lib/scheduler';
-import { tokens } from '@/lib/theme';
+import { buttonReset, tokens } from '@/lib/theme';
 import type { Collection, Unit } from '@/lib/types';
 import DueBanner from '../DueBanner';
 import FeedCard from '../FeedCard';
 import Highlights from '../Highlights';
-import SchedulerDemo, { type SchedulerDemoProps } from '../SchedulerDemo';
+import { initials } from '../ProfilePanel';
 import type { UnitActions } from '../UnitActions';
 
 export default function FeedView({
@@ -17,9 +17,10 @@ export default function FeedView({
   today,
   dueCount,
   bannerVisible,
+  displayName,
   onOpenDue,
   onOpenHighlight,
-  demo,
+  onOpenProfile,
 }: {
   units: Unit[];
   collections: Collection[];
@@ -29,19 +30,19 @@ export default function FeedView({
   today: number;
   dueCount: number;
   bannerVisible: boolean;
+  displayName: string;
   onOpenDue: () => void;
   onOpenHighlight: (c: Collection) => void;
-  demo: SchedulerDemoProps | null;
+  onOpenProfile: () => void;
 }) {
   const byId = new Map(collections.map((c) => [c.id, c]));
-  const dayLabel = dueCount ? `${dueCount} due` : 'Up to date';
 
   return (
     <div style={{ padding: '4px 0 24px' }}>
       <div
         style={{
           display: 'flex',
-          alignItems: 'baseline',
+          alignItems: 'center',
           justifyContent: 'space-between',
           padding: '8px 18px 10px',
         }}
@@ -56,24 +57,31 @@ export default function FeedView({
         >
           Team Flow
         </div>
-        <div
+        {/* Profile entry — replaces the static day sticker (handoff §Slice C);
+            the day count now lives inside the panel. */}
+        <button
+          type="button"
+          onClick={onOpenProfile}
+          aria-label="Open profile and settings"
           style={{
-            fontSize: 11,
-            fontWeight: 800,
-            letterSpacing: 0.6,
-            color: tokens.ink,
+            ...buttonReset,
+            width: 36,
+            height: 36,
+            borderRadius: '50%',
             background: tokens.sticker,
-            padding: '5px 12px',
-            borderRadius: 999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 13,
+            fontWeight: 900,
+            color: tokens.ink,
           }}
         >
-          {dayLabel}
-        </div>
+          {initials(displayName)}
+        </button>
       </div>
 
       <Highlights collections={collections} units={units} progress={progress} onOpen={onOpenHighlight} />
-
-      {demo && <SchedulerDemo {...demo} />}
 
       {bannerVisible && <DueBanner count={dueCount} onOpen={onOpenDue} />}
 

@@ -1,5 +1,5 @@
 'use client';
-import { tokens } from '@/lib/theme';
+import { buttonReset, tokens } from '@/lib/theme';
 import type { Unit } from '@/lib/types';
 
 export default function SavedView({
@@ -41,18 +41,20 @@ export default function SavedView({
       )}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {saved.map((u) => (
-          <div
+          <button
+            type="button"
             key={u.id}
             onClick={() => openDetail(u.id)}
             style={{
+              ...buttonReset,
               padding: '13px 14px',
               borderRadius: 12,
               border: `1px solid ${tokens.hairline}`,
               background: '#FFFFFF',
-              cursor: 'pointer',
               display: 'flex',
               flexDirection: 'column',
               gap: 3,
+              textAlign: 'left',
             }}
           >
             <div
@@ -76,7 +78,7 @@ export default function SavedView({
               </span>
             </div>
             <span style={{ fontSize: 12, color: tokens.text3 }}>{u.hook}</span>
-          </div>
+          </button>
         ))}
       </div>
     </div>

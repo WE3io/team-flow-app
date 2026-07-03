@@ -13,9 +13,11 @@ Phase 1 (rendering MVP) is live at https://team-flow-app-lilac.vercel.app —
 pushes to `main` auto-deploy production; branches get Vercel previews.
 Phase 2 work is specified in **`PHASE2_HANDOFF.md`** — read it before touching
 Phase 2 scope. Done so far: slice A (responsive shell — phone frame removed,
-centred 768px column) and slice B (persistence — Prisma + Postgres, local-first
-sync, pairing codes, real-date scheduling). Slices C (profile/settings) and
-D (gamification) remain. Quizzing (Phase 3) is still out of scope.
+centred 768px column), slice B (persistence — Prisma + Postgres, local-first
+sync, pairing codes, real-date scheduling), and slice C (profile/settings —
+avatar entry, editable name, collection/box stats, pairing UI, canvas share
+card, reset). Slice D (gamification) remains. Quizzing (Phase 3) is still out
+of scope.
 
 Persistence is **optional at runtime**: without `DATABASE_URL` the app runs
 local-first (localStorage only) and API routes return 503 `no-persistence`.

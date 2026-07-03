@@ -1,6 +1,6 @@
 'use client';
 import { isDue } from '@/lib/scheduler';
-import { tierLabel, tokens, typeStyle } from '@/lib/theme';
+import { buttonReset, tierLabel, tokens, typeStyle } from '@/lib/theme';
 import type { Collection, Unit } from '@/lib/types';
 import RevealBlock from './RevealBlock';
 import type { UnitActions } from './UnitActions';
@@ -77,18 +77,20 @@ export default function FeedCard({
           </span>
         )}
         <div style={{ flex: 1 }} />
-        <span
+        <button
+          type="button"
           onClick={() => actions.onBookmark(unit.id)}
+          aria-pressed={bookmarked}
           style={{
+            ...buttonReset,
             fontSize: 10,
             fontWeight: 800,
             letterSpacing: 0.6,
-            cursor: 'pointer',
             color: bookmarked ? tokens.success : tokens.text5,
           }}
         >
           {bookmarked ? 'Saved ✓' : 'Save'}
-        </span>
+        </button>
       </div>
 
       <div

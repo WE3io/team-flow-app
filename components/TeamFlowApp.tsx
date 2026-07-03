@@ -6,6 +6,7 @@ import { useTeamFlowStore } from '@/lib/sync';
 import type { Collection, Unit } from '@/lib/types';
 import BottomNav, { type TabKey } from './BottomNav';
 import DetailSheet from './DetailSheet';
+import ProfilePanel from './ProfilePanel';
 import StoryViewer, { type ViewerState } from './StoryViewer';
 import type { UnitActions } from './UnitActions';
 import FeedView from './views/FeedView';
@@ -29,11 +30,22 @@ export default function TeamFlowApp({ units, collections }: { units: Unit[]; col
   const [typeFilter, setTypeFilter] = useState('all');
   const [detail, setDetail] = useState<string | null>(null);
   const [viewer, setViewer] = useState<ViewerState | null>(null);
+  const [profileOpen, setProfileOpen] = useState(false);
 
-  // Feed controls (demo-only offset gated behind the env flag).
+  // Scheduler-demo lens (gated behind the env flag; lives in profile settings).
   const [demoOffset, setDemoOffset] = useState(0);
   const [showDueBanner, setShowDueBanner] = useState(true);
   const [noviceOrdering, setNoviceOrdering] = useState(true);
+  const demo = SCHEDULER_DEMO
+    ? {
+        demoOffset,
+        onDemoOffset: setDemoOffset,
+        showDueBanner,
+        onShowDueBanner: setShowDueBanner,
+        noviceOrdering,
+        onNoviceOrdering: setNoviceOrdering,
+      }
+    : null;
 
   // Real time at day granularity replaces Phase-1 simDay; the demo offset (when
   // enabled) shifts only the lens, never the stored dates.
@@ -120,20 +132,10 @@ export default function TeamFlowApp({ units, collections }: { units: Unit[]; col
             today={today}
             dueCount={due.length}
             bannerVisible={bannerVisible}
+            displayName={flow.displayName}
             onOpenDue={openDue}
             onOpenHighlight={openHighlight}
-            demo={
-              SCHEDULER_DEMO
-                ? {
-                    demoOffset,
-                    onDemoOffset: setDemoOffset,
-                    showDueBanner,
-                    onShowDueBanner: setShowDueBanner,
-                    noviceOrdering,
-                    onNoviceOrdering: setNoviceOrdering,
-                  }
-                : null
-            }
+            onOpenProfile={() => setProfileOpen(true)}
           />
         )}
         {tab === 'path' && (
@@ -182,6 +184,16 @@ export default function TeamFlowApp({ units, collections }: { units: Unit[]; col
           onPrev={viewerPrev}
           onNext={viewerNext}
           onClose={() => setViewer(null)}
+        />
+      )}
+
+      {profileOpen && (
+        <ProfilePanel
+          units={units}
+          collections={collections}
+          flow={flow}
+          demo={demo}
+          onClose={() => setProfileOpen(false)}
         />
       )}
     </div>

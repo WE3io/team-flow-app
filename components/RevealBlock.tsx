@@ -1,6 +1,6 @@
 'use client';
 import { box, interval } from '@/lib/scheduler';
-import { tokens } from '@/lib/theme';
+import { buttonReset, tokens } from '@/lib/theme';
 import type { Unit } from '@/lib/types';
 import Markdown from './Markdown';
 import type { UnitActions } from './UnitActions';
@@ -30,13 +30,16 @@ export default function RevealBlock({
 
   if (!revealed) {
     return (
-      <div
+      <button
+        type="button"
         onClick={() => actions.onReveal(unit.id)}
         style={{
+          ...buttonReset,
           display: 'flex',
           flexDirection: 'column',
           gap: 10,
-          cursor: 'pointer',
+          width: '100%',
+          textAlign: 'left',
           flex: size === 'lg' ? 1 : undefined,
         }}
       >
@@ -91,7 +94,7 @@ export default function RevealBlock({
         >
           Tap to reveal
         </div>
-      </div>
+      </button>
     );
   }
 
@@ -152,9 +155,11 @@ export default function RevealBlock({
 function boxStatus(unit: Unit, actions: UnitActions): string {
   const g = actions.progress.graded[unit.id];
   const b = box(actions.progress, unit.id);
-  const ls = actions.progress.lastSeen[unit.id] ?? 0;
-  if (g === 'good') return `Got it · Box ${b} · resurfaces day ${ls + interval(b)}`;
-  if (g === 'again') return `Back to Box 1 · resurfaces day ${ls + 1}`;
+  // lastSeen is a real day-index now (epoch days) — phrase the return as a
+  // relative wait, not an absolute day number.
+  const inDays = (n: number) => (n <= 1 ? 'tomorrow' : `in ${n} days`);
+  if (g === 'good') return `Got it · Box ${b} · resurfaces ${inDays(interval(b))}`;
+  if (g === 'again') return `Back to Box 1 · resurfaces ${inDays(1)}`;
   return '';
 }
 

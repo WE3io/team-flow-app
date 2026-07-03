@@ -1,6 +1,6 @@
 'use client';
 import { filterLibrary } from '@/lib/query';
-import { tierLabel, tokens, typeStyle } from '@/lib/theme';
+import { buttonReset, tierLabel, tokens, typeStyle } from '@/lib/theme';
 import type { Unit } from '@/lib/types';
 
 const TIER_CHIPS: [string, string][] = [
@@ -20,21 +20,23 @@ const TYPE_CHIPS: [string, string][] = [
 
 function Chip({ label, active, onTap }: { label: string; active: boolean; onTap: () => void }) {
   return (
-    <span
+    <button
+      type="button"
       onClick={onTap}
+      aria-pressed={active}
       style={{
+        ...buttonReset,
         fontSize: 11,
         fontWeight: 700,
         padding: '6px 12px',
         borderRadius: 999,
-        cursor: 'pointer',
         border: `1px solid ${active ? tokens.ink : '#D8D3C4'}`,
         background: active ? tokens.ink : '#FFFFFF',
         color: active ? '#F7F6F2' : tokens.text2,
       }}
     >
       {label}
-    </span>
+    </button>
   );
 }
 
@@ -82,19 +84,21 @@ export default function LibraryView({
         {tiles.map((u) => {
           const ts = typeStyle(u.type);
           return (
-            <div
+            <button
+              type="button"
               key={u.id}
               onClick={() => openDetail(u.id)}
               style={{
+                ...buttonReset,
                 background: '#FFFFFF',
                 border: `1px solid ${tokens.hairline}`,
                 borderRadius: 14,
                 padding: 12,
-                cursor: 'pointer',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 8,
                 minHeight: 84,
+                textAlign: 'left',
                 boxShadow: '0 1px 2px rgba(22,21,15,0.04)',
               }}
             >
@@ -129,7 +133,7 @@ export default function LibraryView({
               >
                 L{u.level} · {tierLabel(u.tier)}
               </span>
-            </div>
+            </button>
           );
         })}
         {tiles.length === 0 && (

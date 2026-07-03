@@ -26,6 +26,7 @@ const K_USER = 'tf.userId';
 const K_NAME = 'tf.displayName';
 const K_STORE = 'tf.progress';
 const K_EVENTS = 'tf.events';
+const K_STARTED = 'tf.startedAt';
 
 export type SyncState = 'local' | 'syncing' | 'synced' | 'offline';
 
@@ -70,6 +71,8 @@ export interface TeamFlowStore {
   userId: string | null;
   displayName: string;
   sync: SyncState;
+  /** epoch ms of the user's first visit on this device (profile "Day N"). */
+  startedAtMs: number;
   reveal: (id: string) => void;
   gradeUnit: (id: string, g: Grade) => void;
   bookmark: (id: string) => void;
@@ -84,6 +87,7 @@ export function useTeamFlowStore(): TeamFlowStore {
   const [userId, setUserId] = useState<string | null>(null);
   const [displayName, setDisplayNameState] = useState('Anonymous');
   const [sync, setSync] = useState<SyncState>('local');
+  const [startedAtMs, setStartedAtMs] = useState(0);
 
   // Refs mirror latest state for use inside async callbacks without stale closures.
   const storeRef = useRef(store);
@@ -280,6 +284,10 @@ export function useTeamFlowStore(): TeamFlowStore {
       setUserId(savedId);
     }
     if (savedName) setDisplayNameState(savedName);
+    // First-visit stamp for the profile's "Day N" count.
+    const started = Number(lsGet(K_STARTED)) || Date.now();
+    lsSet(K_STARTED, String(started));
+    setStartedAtMs(started);
 
     // 2. Reconcile with server in the background.
     (async () => {
@@ -328,6 +336,7 @@ export function useTeamFlowStore(): TeamFlowStore {
     userId,
     displayName,
     sync,
+    startedAtMs,
     reveal,
     gradeUnit,
     bookmark,

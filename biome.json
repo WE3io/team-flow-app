@@ -29,7 +29,6 @@
       "next": "recommended"
     },
     "rules": {
-      "recommended": true,
       "a11y": {
         "noStaticElementInteractions": "warn",
         "useKeyWithClickEvents": "warn"

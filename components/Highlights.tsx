@@ -1,6 +1,6 @@
 'use client';
 import { type Progress, seen } from '@/lib/scheduler';
-import { tokens } from '@/lib/theme';
+import { buttonReset, tokens } from '@/lib/theme';
 import type { Collection, Unit } from '@/lib/types';
 
 /**
@@ -34,15 +34,16 @@ export default function Highlights({
         const covered = us.filter((u) => seen(progress, u.id)).length;
         const pct = Math.round((covered / Math.max(1, us.length)) * 100);
         return (
-          <div
+          <button
+            type="button"
             key={c.id}
             onClick={() => onOpen(c)}
             style={{
+              ...buttonReset,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               gap: 6,
-              cursor: 'pointer',
               flex: '0 0 auto',
               width: 68,
             }}
@@ -84,7 +85,7 @@ export default function Highlights({
             >
               {c.title}
             </span>
-          </div>
+          </button>
         );
       })}
     </div>

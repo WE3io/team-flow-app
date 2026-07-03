@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { tokens } from '@/lib/theme';
+import { buttonReset, tokens } from '@/lib/theme';
 
 export interface SchedulerDemoProps {
   demoOffset: number;
@@ -29,9 +29,12 @@ export default function SchedulerDemo({
 
   return (
     <div style={{ margin: '2px 18px 0' }}>
-      <div
+      <button
+        type="button"
         onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
         style={{
+          ...buttonReset,
           display: 'flex',
           alignItems: 'center',
           gap: 6,
@@ -40,13 +43,12 @@ export default function SchedulerDemo({
           letterSpacing: 0.8,
           textTransform: 'uppercase',
           color: tokens.text4,
-          cursor: 'pointer',
           padding: '6px 0',
         }}
       >
         <span>⚙ Scheduler demo</span>
         <span style={{ color: tokens.text6 }}>{open ? '▲' : '▼'}</span>
-      </div>
+      </button>
 
       {open && (
         <div

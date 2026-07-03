@@ -1,5 +1,5 @@
 'use client';
-import { tokens } from '@/lib/theme';
+import { buttonReset, tokens } from '@/lib/theme';
 
 export type TabKey = 'feed' | 'path' | 'search' | 'saved' | 'library';
 
@@ -26,13 +26,15 @@ export default function BottomNav({ tab, onTab }: { tab: TabKey; onTab: (t: TabK
       {NAV.map((n) => {
         const active = tab === n.key;
         return (
-          <div
+          <button
+            type="button"
             key={n.key}
             onClick={() => onTab(n.key)}
+            aria-current={active ? 'page' : undefined}
             style={{
+              ...buttonReset,
               flex: 1,
               textAlign: 'center',
-              cursor: 'pointer',
               padding: '6px 0',
               display: 'flex',
               flexDirection: 'column',
@@ -53,7 +55,7 @@ export default function BottomNav({ tab, onTab }: { tab: TabKey; onTab: (t: TabK
             >
               {n.label}
             </span>
-          </div>
+          </button>
         );
       })}
     </div>

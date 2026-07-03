@@ -1,6 +1,6 @@
 'use client';
 import { runbookUnits, searchUnits } from '@/lib/query';
-import { tokens, typeStyle } from '@/lib/theme';
+import { buttonReset, tokens, typeStyle } from '@/lib/theme';
 import type { Unit } from '@/lib/types';
 
 export default function SearchView({
@@ -65,18 +65,21 @@ export default function SearchView({
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {runbooks.map((u) => (
-              <div
+              <button
+                type="button"
                 key={u.id}
                 onClick={() => openDetail(u.id)}
                 style={{
+                  ...buttonReset,
                   padding: '13px 14px',
                   borderRadius: 12,
                   border: `1.5px solid ${tokens.runbookBorder}`,
                   background: tokens.runbookBg,
-                  cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
+                  width: '100%',
+                  textAlign: 'left',
                 }}
               >
                 <span style={{ fontSize: 14, fontWeight: 700, color: tokens.ink }}>{u.title}</span>
@@ -91,7 +94,7 @@ export default function SearchView({
                 >
                   Runbook
                 </span>
-              </div>
+              </button>
             ))}
           </div>
         </div>
@@ -108,18 +111,20 @@ export default function SearchView({
             const ts = typeStyle(u.type);
             const rb = u.type === 'runbook';
             return (
-              <div
+              <button
+                type="button"
                 key={u.id}
                 onClick={() => openDetail(u.id)}
                 style={{
+                  ...buttonReset,
                   padding: '13px 14px',
                   borderRadius: 12,
                   border: `1px solid ${rb ? tokens.runbookBorder : tokens.hairline}`,
                   background: rb ? tokens.runbookBg : '#FFFFFF',
-                  cursor: 'pointer',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: 3,
+                  textAlign: 'left',
                 }}
               >
                 <div
@@ -143,7 +148,7 @@ export default function SearchView({
                   </span>
                 </div>
                 <span style={{ fontSize: 12, color: tokens.text3 }}>{u.hook}</span>
-              </div>
+              </button>
             );
           })}
           {results.length === 0 && (

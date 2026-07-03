@@ -1,6 +1,6 @@
 'use client';
 import { isDue } from '@/lib/scheduler';
-import { tokens, typeStyle } from '@/lib/theme';
+import { buttonReset, tokens, typeStyle } from '@/lib/theme';
 import type { Collection, Unit } from '@/lib/types';
 import RevealBlock from './RevealBlock';
 import type { UnitActions } from './UnitActions';
@@ -51,9 +51,9 @@ export default function StoryViewer({
       }}
     >
       <div style={{ display: 'flex', gap: 4, padding: '12px 14px 8px' }}>
-        {viewer.ids.map((_, i) => (
+        {viewer.ids.map((id, i) => (
           <span
-            key={i}
+            key={id}
             style={{
               flex: 1,
               height: 3,
@@ -81,18 +81,20 @@ export default function StoryViewer({
         >
           {viewer.title}
         </span>
-        <span
+        <button
+          type="button"
           onClick={onClose}
+          aria-label="Close viewer"
           style={{
+            ...buttonReset,
             fontSize: 13,
             fontWeight: 800,
             color: '#B8B5A8',
-            cursor: 'pointer',
             padding: 6,
           }}
         >
           ✕
-        </span>
+        </button>
       </div>
 
       <div

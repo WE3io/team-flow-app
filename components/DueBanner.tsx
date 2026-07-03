@@ -1,5 +1,5 @@
 'use client';
-import { tokens } from '@/lib/theme';
+import { buttonReset, tokens } from '@/lib/theme';
 
 /**
  * Daily-review banner — the "dark instrument moment" (transcript direction).
@@ -8,9 +8,11 @@ import { tokens } from '@/lib/theme';
  */
 export default function DueBanner({ count, onOpen }: { count: number; onOpen: () => void }) {
   return (
-    <div
+    <button
+      type="button"
       onClick={onOpen}
       style={{
+        ...buttonReset,
         margin: '14px 18px 2px',
         padding: '14px 16px',
         borderRadius: 16,
@@ -19,7 +21,8 @@ export default function DueBanner({ count, onOpen }: { count: number; onOpen: ()
         display: 'flex',
         alignItems: 'center',
         gap: 14,
-        cursor: 'pointer',
+        width: 'calc(100% - 36px)',
+        textAlign: 'left',
       }}
     >
       <div
@@ -80,6 +83,6 @@ export default function DueBanner({ count, onOpen }: { count: number; onOpen: ()
       >
         Start
       </span>
-    </div>
+    </button>
   );
 }

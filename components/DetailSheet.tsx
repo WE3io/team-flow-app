@@ -1,5 +1,5 @@
 'use client';
-import { tierLabel, tokens, typeStyle } from '@/lib/theme';
+import { buttonReset, tierLabel, tokens, typeStyle } from '@/lib/theme';
 import type { Collection, Unit } from '@/lib/types';
 import RevealBlock from './RevealBlock';
 import type { UnitActions } from './UnitActions';
@@ -31,7 +31,12 @@ export default function DetailSheet({
         zIndex: 40,
       }}
     >
-      <div onClick={onClose} style={{ flex: 1 }} />
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Close details"
+        style={{ ...buttonReset, flex: 1, cursor: 'default' }}
+      />
       <div
         className="no-scrollbar"
         style={{
@@ -64,18 +69,19 @@ export default function DetailSheet({
           >
             {unit.type}
           </span>
-          <span
+          <button
+            type="button"
             onClick={onClose}
             style={{
+              ...buttonReset,
               fontSize: 12,
               fontWeight: 800,
               color: tokens.text3,
-              cursor: 'pointer',
               padding: '6px 10px',
             }}
           >
             Close ✕
-          </span>
+          </button>
         </div>
 
         <div
@@ -114,17 +120,19 @@ export default function DetailSheet({
           >
             {collection?.title ?? unit.collection} · {tierLabel(unit.tier)}
           </span>
-          <span
+          <button
+            type="button"
             onClick={() => actions.onBookmark(unit.id)}
+            aria-pressed={bookmarked}
             style={{
+              ...buttonReset,
               fontSize: 11,
               fontWeight: 800,
-              cursor: 'pointer',
               color: bookmarked ? tokens.success : tokens.text5,
             }}
           >
             {bookmarked ? 'Saved ✓' : 'Save'}
-          </span>
+          </button>
         </div>
       </div>
     </div>
