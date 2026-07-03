@@ -1,7 +1,8 @@
 'use client';
 import { useMemo, useState } from 'react';
 import { computeFeed, dueUnits, type Grade } from '@/lib/scheduler';
-import { bookmarkMap, DAY_MS, toSchedulerProgress } from '@/lib/store';
+import { computeStreaks } from '@/lib/stats';
+import { bookmarkMap, DAY_MS, dayIndex, toSchedulerProgress } from '@/lib/store';
 import { useTeamFlowStore } from '@/lib/sync';
 import type { Collection, Unit } from '@/lib/types';
 import BottomNav, { type TabKey } from './BottomNav';
@@ -53,6 +54,14 @@ export default function TeamFlowApp({ units, collections }: { units: Unit[]; col
 
   const progress = useMemo(() => toSchedulerProgress(flow.store), [flow.store]);
   const bookmarks = useMemo(() => bookmarkMap(flow.store), [flow.store]);
+  const streak = useMemo(
+    () =>
+      computeStreaks(
+        flow.reviewLog.map((e) => dayIndex(e.atMs)),
+        dayIndex(Date.now()),
+      ).current,
+    [flow.reviewLog],
+  );
 
   const byId = useMemo(() => new Map(units.map((u) => [u.id, u])), [units]);
   const collById = useMemo(() => new Map(collections.map((c) => [c.id, c])), [collections]);
@@ -133,6 +142,7 @@ export default function TeamFlowApp({ units, collections }: { units: Unit[]; col
             dueCount={due.length}
             bannerVisible={bannerVisible}
             displayName={flow.displayName}
+            streak={streak}
             onOpenDue={openDue}
             onOpenHighlight={openHighlight}
             onOpenProfile={() => setProfileOpen(true)}

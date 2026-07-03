@@ -18,6 +18,7 @@ export default function FeedView({
   dueCount,
   bannerVisible,
   displayName,
+  streak,
   onOpenDue,
   onOpenHighlight,
   onOpenProfile,
@@ -31,6 +32,8 @@ export default function FeedView({
   dueCount: number;
   bannerVisible: boolean;
   displayName: string;
+  /** current review streak in days; a subtle chip appears from 2 up */
+  streak: number;
   onOpenDue: () => void;
   onOpenHighlight: (c: Collection) => void;
   onOpenProfile: () => void;
@@ -57,28 +60,45 @@ export default function FeedView({
         >
           Team Flow
         </div>
-        {/* Profile entry — replaces the static day sticker (handoff §Slice C);
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {streak >= 2 && (
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: 0.5,
+                color: tokens.successInk,
+                background: tokens.successBg,
+                padding: '4px 10px',
+                borderRadius: 999,
+              }}
+            >
+              {streak}-day streak
+            </span>
+          )}
+          {/* Profile entry — replaces the static day sticker (handoff §Slice C);
             the day count now lives inside the panel. */}
-        <button
-          type="button"
-          onClick={onOpenProfile}
-          aria-label="Open profile and settings"
-          style={{
-            ...buttonReset,
-            width: 36,
-            height: 36,
-            borderRadius: '50%',
-            background: tokens.sticker,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 13,
-            fontWeight: 900,
-            color: tokens.ink,
-          }}
-        >
-          {initials(displayName)}
-        </button>
+          <button
+            type="button"
+            onClick={onOpenProfile}
+            aria-label="Open profile and settings"
+            style={{
+              ...buttonReset,
+              width: 36,
+              height: 36,
+              borderRadius: '50%',
+              background: tokens.sticker,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 13,
+              fontWeight: 900,
+              color: tokens.ink,
+            }}
+          >
+            {initials(displayName)}
+          </button>
+        </div>
       </div>
 
       <Highlights collections={collections} units={units} progress={progress} onOpen={onOpenHighlight} />

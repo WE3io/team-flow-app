@@ -1,6 +1,7 @@
 'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Grade } from './scheduler';
+import type { ReviewLogEntry } from './stats';
 import {
   emptyStore,
   fromRows,
@@ -27,6 +28,23 @@ const K_NAME = 'tf.displayName';
 const K_STORE = 'tf.progress';
 const K_EVENTS = 'tf.events';
 const K_STARTED = 'tf.startedAt';
+const K_LOG = 'tf.reviewLog';
+// Local review history for streaks + weekly recap (slice D). Bounded — old
+// entries age out of the metrics windows anyway.
+const LOG_CAP = 1000;
+
+/** Union two review logs, dedupe by unit+timestamp, keep the newest LOG_CAP. */
+function mergeLogs(a: ReviewLogEntry[], b: ReviewLogEntry[]): ReviewLogEntry[] {
+  const seen = new Set<string>();
+  const out: ReviewLogEntry[] = [];
+  for (const e of [...a, ...b].sort((x, y) => x.atMs - y.atMs)) {
+    const key = `${e.unitId}:${e.atMs}:${e.result}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(e);
+  }
+  return out.slice(-LOG_CAP);
+}
 
 export type SyncState = 'local' | 'syncing' | 'synced' | 'offline';
 
@@ -34,6 +52,13 @@ interface EventOut {
   unitId: string;
   result: Grade;
   at: string;
+}
+
+/** Server event wire format → local log entries (invalid timestamps dropped). */
+function wireToLog(events?: EventOut[]): ReviewLogEntry[] {
+  return (events ?? [])
+    .map((e) => ({ unitId: e.unitId, result: e.result, atMs: Date.parse(e.at) }))
+    .filter((e) => !Number.isNaN(e.atMs));
 }
 
 function lsGet(k: string): string | null {
@@ -73,6 +98,8 @@ export interface TeamFlowStore {
   sync: SyncState;
   /** epoch ms of the user's first visit on this device (profile "Day N"). */
   startedAtMs: number;
+  /** local review history (streaks + recap); merged with server events on sync. */
+  reviewLog: ReviewLogEntry[];
   reveal: (id: string) => void;
   gradeUnit: (id: string, g: Grade) => void;
   bookmark: (id: string) => void;
@@ -88,12 +115,20 @@ export function useTeamFlowStore(): TeamFlowStore {
   const [displayName, setDisplayNameState] = useState('Anonymous');
   const [sync, setSync] = useState<SyncState>('local');
   const [startedAtMs, setStartedAtMs] = useState(0);
+  const [reviewLog, setReviewLogState] = useState<ReviewLogEntry[]>([]);
 
   // Refs mirror latest state for use inside async callbacks without stale closures.
   const storeRef = useRef(store);
   const userRef = useRef<string | null>(null);
   const eventsRef = useRef<EventOut[]>([]);
+  const logRef = useRef<ReviewLogEntry[]>([]);
   const pushTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const setReviewLog = useCallback((next: ReviewLogEntry[]) => {
+    logRef.current = next;
+    setReviewLogState(next);
+    lsSet(K_LOG, JSON.stringify(next));
+  }, []);
 
   const setStore = useCallback((next: StoredProgress) => {
     storeRef.current = next;
@@ -183,17 +218,19 @@ export function useTeamFlowStore(): TeamFlowStore {
 
   const gradeUnit = useCallback(
     (id: string, g: Grade) => {
-      setStore(gradeStore(storeRef.current, id, g, Date.now()));
+      const now = Date.now();
+      setStore(gradeStore(storeRef.current, id, g, now));
       const ev: EventOut = {
         unitId: id,
         result: g,
-        at: new Date().toISOString(),
+        at: new Date(now).toISOString(),
       };
       eventsRef.current = [...eventsRef.current, ev];
       lsSet(K_EVENTS, JSON.stringify(eventsRef.current));
+      setReviewLog([...logRef.current, { unitId: id, result: g, atMs: now }].slice(-LOG_CAP));
       schedulePush();
     },
-    [setStore, schedulePush],
+    [setStore, schedulePush, setReviewLog],
   );
 
   const bookmark = useCallback(
@@ -217,9 +254,10 @@ export function useTeamFlowStore(): TeamFlowStore {
     setStore(emptyStore());
     eventsRef.current = [];
     lsDel(K_EVENTS);
+    setReviewLog([]);
     const id = userRef.current;
     if (id) await jsonPost(`/api/user/${id}/reset`, {}).catch(() => {});
-  }, [setStore]);
+  }, [setStore, setReviewLog]);
 
   const pairGenerate = useCallback(async () => {
     const id = await ensureUser();
@@ -244,19 +282,21 @@ export function useTeamFlowStore(): TeamFlowStore {
           userId: string;
           displayName: string;
           progress: ProgressRow[];
+          events?: EventOut[];
         } = await res.json();
         // Adopt the paired user; server state merges with local unsynced units.
         setUser(data.userId);
         setName(data.displayName);
         const merged = mergeStores(storeRef.current, fromRows(data.progress));
         setStore(merged);
+        setReviewLog(mergeLogs(logRef.current, wireToLog(data.events)));
         await push();
         return 'ok';
       } catch {
         return 'error';
       }
     },
-    [setUser, setName, setStore, push],
+    [setUser, setName, setStore, setReviewLog, push],
   );
 
   // ---------- hydration on mount ----------
@@ -275,6 +315,12 @@ export function useTeamFlowStore(): TeamFlowStore {
     } catch {
       eventsRef.current = [];
     }
+    try {
+      logRef.current = JSON.parse(lsGet(K_LOG) ?? '[]');
+    } catch {
+      logRef.current = [];
+    }
+    setReviewLogState(logRef.current);
     storeRef.current = localStore;
     setStoreState(localStore);
     const savedId = lsGet(K_USER);
@@ -302,9 +348,14 @@ export function useTeamFlowStore(): TeamFlowStore {
           if (res.status === 404) {
             id = await ensureUser(true);
           } else if (res.ok) {
-            const data: { displayName: string; progress: ProgressRow[] } = await res.json();
+            const data: {
+              displayName: string;
+              progress: ProgressRow[];
+              events?: EventOut[];
+            } = await res.json();
             setName(data.displayName);
             setStore(mergeStores(storeRef.current, fromRows(data.progress)));
+            setReviewLog(mergeLogs(logRef.current, wireToLog(data.events)));
           } else if (res.status === 503) {
             setSync('local'); // no persistence configured — stay local, no error
             return;
@@ -337,6 +388,7 @@ export function useTeamFlowStore(): TeamFlowStore {
     displayName,
     sync,
     startedAtMs,
+    reviewLog,
     reveal,
     gradeUnit,
     bookmark,

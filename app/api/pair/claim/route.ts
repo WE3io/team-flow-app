@@ -35,9 +35,16 @@ export async function POST(req: Request) {
     data: { pairingCode: null, pairingExpiry: null },
   });
 
+  const events = await prisma.reviewEvent.findMany({
+    where: { userId: user.id, at: { gte: new Date(Date.now() - 90 * 86_400_000) } },
+    orderBy: { at: 'asc' },
+    take: 1000,
+  });
+
   return NextResponse.json({
     userId: user.id,
     displayName: user.displayName,
     progress: user.progress.map(rowFromDb),
+    events: events.map((e) => ({ unitId: e.unitId, result: e.result, at: e.at.toISOString() })),
   });
 }

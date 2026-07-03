@@ -16,8 +16,9 @@ Phase 2 scope. Done so far: slice A (responsive shell — phone frame removed,
 centred 768px column), slice B (persistence — Prisma + Postgres, local-first
 sync, pairing codes, real-date scheduling), and slice C (profile/settings —
 avatar entry, editable name, collection/box stats, pairing UI, canvas share
-card, reset). Slice D (gamification) remains. Quizzing (Phase 3) is still out
-of scope.
+card, reset), and slice D (gamification — leaderboard, streaks, collection
+badges, weekly recap; see `lib/stats.ts` + `/api/leaderboard`). Phase 2 is
+complete pending review. Quizzing (Phase 3) is still out of scope.
 
 Persistence is **optional at runtime**: without `DATABASE_URL` the app runs
 local-first (localStorage only) and API routes return 503 `no-persistence`.

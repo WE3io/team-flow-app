@@ -11,6 +11,9 @@ export interface ShareCollection {
   letter: string;
   color: string;
   pct: number; // 0..100 covered
+  /** collection badges (slice D): all seen / all box ≥ 4 */
+  completed?: boolean;
+  mastered?: boolean;
 }
 
 export interface ShareCardData {
@@ -141,9 +144,9 @@ export async function renderShareCard(data: ShareCardData): Promise<Blob> {
     ctx.font = font('900 44px');
     ctx.textAlign = 'center';
     ctx.fillText(c.letter, cx, cy + 16);
-    ctx.fillStyle = tokens.text3;
+    ctx.fillStyle = c.mastered || c.completed ? tokens.successInk : tokens.text3;
     ctx.font = font('700 24px');
-    ctx.fillText(`${c.pct}%`, cx, cy + r + 42);
+    ctx.fillText(c.mastered ? '★' : c.completed ? '✓' : `${c.pct}%`, cx, cy + r + 42);
     ctx.textAlign = 'left';
   });
 

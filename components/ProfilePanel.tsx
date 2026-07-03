@@ -1,7 +1,8 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
 import { MAX_BOX } from '@/lib/scheduler';
-import { DAY_MS, isSeen } from '@/lib/store';
+import { computeBadges, computeRecap, computeStreaks, MASTERED_BOX } from '@/lib/stats';
+import { DAY_MS, dayIndex, isSeen } from '@/lib/store';
 import type { TeamFlowStore } from '@/lib/sync';
 import { buttonReset, tokens } from '@/lib/theme';
 import type { Collection, Unit } from '@/lib/types';
@@ -9,12 +10,11 @@ import SchedulerDemo, { type SchedulerDemoProps } from './SchedulerDemo';
 import { renderShareCard, shareOrDownload } from './shareCard';
 
 /**
- * Full-screen profile & settings panel (handoff §Slice C). Quiet surfaces,
+ * Full-screen profile & settings panel (handoff §Slice C + D). Quiet surfaces,
  * colour in the progress donuts and Leitner distribution — same language as
- * the feed highlights. Badges + streak render as placeholders until slice D.
+ * the feed highlights. Slice D adds streaks, collection badges, the weekly
+ * recap and the team leaderboard (all retrieval/completion measures, seed §6).
  */
-
-const MASTERED_BOX = 4; // box ≥ 4 counts as mastered (handoff §Slice D)
 
 export function initials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -81,6 +81,17 @@ export default function ProfilePanel({
     const mastered = perCollection.reduce((n, p) => n + p.mastered, 0);
     return { perCollection, boxDist, covered, mastered, total: units.length };
   }, [units, collections, flow.store]);
+
+  const gamification = useMemo(() => {
+    const now = Date.now();
+    const streaks = computeStreaks(
+      flow.reviewLog.map((e) => dayIndex(e.atMs)),
+      dayIndex(now),
+    );
+    const recap = computeRecap(flow.reviewLog, now, flow.store);
+    const badges = new Map(computeBadges(units, flow.store).map((b) => [b.collectionId, b]));
+    return { streaks, recap, badges };
+  }, [flow.reviewLog, flow.store, units]);
 
   const day = flow.startedAtMs ? Math.floor((Date.now() - flow.startedAtMs) / DAY_MS) + 1 : 1;
 
@@ -242,8 +253,16 @@ export default function ProfilePanel({
                   {c.title}
                 </span>
                 <span style={{ fontSize: 10, fontWeight: 700, color: tokens.text4 }}>
-                  {covered}/{total}
-                  {mastered > 0 && <span style={{ color: tokens.successInk }}> · {mastered}★</span>}
+                  {gamification.badges.get(c.id)?.mastered ? (
+                    <span style={{ color: tokens.successInk }}>★ Mastered</span>
+                  ) : gamification.badges.get(c.id)?.completed ? (
+                    <span style={{ color: tokens.successInk }}>✓ Completed</span>
+                  ) : (
+                    <>
+                      {covered}/{total}
+                      {mastered > 0 && <span style={{ color: tokens.successInk }}> · {mastered}★</span>}
+                    </>
+                  )}
                 </span>
               </div>
             ))}
@@ -285,18 +304,48 @@ export default function ProfilePanel({
           </p>
         </Card>
 
-        {/* Streak + badges — slice D placeholders */}
-        <SectionLabel>Streak & badges</SectionLabel>
+        {/* Streaks — a day counts when you graded at least one card (seed-endorsed: rewards returning) */}
+        <SectionLabel>Streak</SectionLabel>
         <Card>
           <div style={{ display: 'flex', gap: 10 }}>
-            <StatTile big="—" label="Current streak" />
-            <StatTile big="—" label="Best streak" />
+            <StatTile
+              big={gamification.streaks.current ? `${gamification.streaks.current}d` : '—'}
+              label="Current streak"
+              accent={gamification.streaks.current ? tokens.successInk : undefined}
+            />
+            <StatTile
+              big={gamification.streaks.best ? `${gamification.streaks.best}d` : '—'}
+              label="Best streak"
+            />
             <StatTile big={String(stats.mastered)} label="Mastered" accent={tokens.successInk} />
           </div>
           <p style={{ fontSize: 11, color: tokens.text4, margin: '10px 0 0', lineHeight: 1.4 }}>
-            Streaks and collection badges arrive with the gamification update.
+            A day counts when you grade at least one card. Spacing works because you come back.
           </p>
         </Card>
+
+        {/* Weekly recap — trailing 7 days from the review log */}
+        <SectionLabel>This week</SectionLabel>
+        <Card>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <StatTile big={String(gamification.recap.reviewed)} label="Reviews" />
+            <StatTile
+              big={gamification.recap.accuracyPct === null ? '—' : `${gamification.recap.accuracyPct}%`}
+              label="Accuracy"
+              accent={
+                gamification.recap.accuracyPct !== null && gamification.recap.accuracyPct >= 70
+                  ? tokens.successInk
+                  : undefined
+              }
+            />
+            <StatTile big={String(gamification.recap.newlyMastered)} label="Newly mastered" />
+            <StatTile big={`${gamification.recap.activeDays}/7`} label="Active days" />
+          </div>
+        </Card>
+
+        {/* Leaderboard — mastered primary, 30-day accuracy secondary (server) */}
+        <SectionLabel>Team leaderboard</SectionLabel>
+        <LeaderboardSection selfId={flow.userId} />
 
         {/* Share */}
         <SectionLabel>Share progress</SectionLabel>
@@ -307,8 +356,14 @@ export default function ProfilePanel({
             mastered: stats.mastered,
             covered: stats.covered,
             total: stats.total,
-            streak: null,
-            collections: stats.perCollection.map(({ c, pct }) => ({ letter: c.letter, color: c.color, pct })),
+            streak: gamification.streaks.current || null,
+            collections: stats.perCollection.map(({ c, pct }) => ({
+              letter: c.letter,
+              color: c.color,
+              pct,
+              completed: gamification.badges.get(c.id)?.completed ?? false,
+              mastered: gamification.badges.get(c.id)?.mastered ?? false,
+            })),
           }}
         />
 
@@ -635,6 +690,192 @@ function ResetSection({ flow }: { flow: TeamFlowStore }) {
         </button>
       )}
       {done && <p style={{ fontSize: 11, color: tokens.text4, margin: '8px 0 0' }}>Progress reset.</p>}
+    </Card>
+  );
+}
+
+interface LeaderboardRow {
+  userId: string;
+  displayName: string;
+  mastered: number;
+  accuracyPct: number | null;
+  streak: number;
+}
+
+function LeaderboardSection({ selfId }: { selfId: string | null }) {
+  const [rows, setRows] = useState<LeaderboardRow[] | null>(null);
+  const [state, setState] = useState<'loading' | 'ok' | 'unavailable'>('loading');
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const res = await fetch('/api/leaderboard', { cache: 'no-store' });
+        if (!alive) return;
+        if (!res.ok) {
+          setState('unavailable');
+          return;
+        }
+        const data: { leaderboard: LeaderboardRow[] } = await res.json();
+        setRows(data.leaderboard);
+        setState('ok');
+      } catch {
+        if (alive) setState('unavailable');
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  return (
+    <Card>
+      {state === 'loading' && <p style={{ fontSize: 12, color: tokens.text4, margin: 0 }}>Loading…</p>}
+      {state === 'unavailable' && (
+        <p style={{ fontSize: 12, color: tokens.text4, margin: 0, lineHeight: 1.4 }}>
+          The leaderboard needs a connection — it compares everyone's retrieval progress on the server.
+        </p>
+      )}
+      {state === 'ok' && rows && rows.length === 0 && (
+        <p style={{ fontSize: 12, color: tokens.text4, margin: 0 }}>
+          No reviews on the board yet — grade a card and take first place.
+        </p>
+      )}
+      {state === 'ok' && rows && rows.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div style={{ display: 'flex', gap: 8, padding: '0 0 6px' }}>
+            <span style={{ width: 22 }} />
+            <span
+              style={{
+                flex: 1,
+                fontSize: 9,
+                fontWeight: 800,
+                letterSpacing: 0.8,
+                color: tokens.text5,
+                textTransform: 'uppercase',
+              }}
+            >
+              Name
+            </span>
+            <span
+              style={{
+                width: 64,
+                textAlign: 'right',
+                fontSize: 9,
+                fontWeight: 800,
+                letterSpacing: 0.8,
+                color: tokens.text5,
+                textTransform: 'uppercase',
+              }}
+            >
+              Mastered
+            </span>
+            <span
+              style={{
+                width: 60,
+                textAlign: 'right',
+                fontSize: 9,
+                fontWeight: 800,
+                letterSpacing: 0.8,
+                color: tokens.text5,
+                textTransform: 'uppercase',
+              }}
+            >
+              30d acc.
+            </span>
+            <span
+              style={{
+                width: 44,
+                textAlign: 'right',
+                fontSize: 9,
+                fontWeight: 800,
+                letterSpacing: 0.8,
+                color: tokens.text5,
+                textTransform: 'uppercase',
+              }}
+            >
+              Streak
+            </span>
+          </div>
+          {rows.map((r, i) => {
+            const isSelf = r.userId === selfId;
+            return (
+              <div
+                key={r.userId}
+                style={{
+                  display: 'flex',
+                  gap: 8,
+                  alignItems: 'baseline',
+                  padding: '7px 0',
+                  borderTop: `1px solid ${tokens.hairlineSoft}`,
+                  background: isSelf ? tokens.successBg : 'transparent',
+                  borderRadius: isSelf ? 8 : 0,
+                }}
+              >
+                <span
+                  style={{
+                    width: 22,
+                    fontSize: 12,
+                    fontWeight: 900,
+                    color: i < 3 ? tokens.ink : tokens.text5,
+                    textAlign: 'center',
+                  }}
+                >
+                  {i + 1}
+                </span>
+                <span
+                  style={{
+                    flex: 1,
+                    minWidth: 0,
+                    fontSize: 13,
+                    fontWeight: isSelf ? 900 : 700,
+                    color: tokens.ink,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {r.displayName}
+                  {isSelf && <span style={{ color: tokens.successInk, fontWeight: 800 }}> · you</span>}
+                </span>
+                <span
+                  style={{
+                    width: 64,
+                    textAlign: 'right',
+                    fontSize: 13,
+                    fontWeight: 900,
+                    color: tokens.successInk,
+                  }}
+                >
+                  {r.mastered}
+                </span>
+                <span
+                  style={{
+                    width: 60,
+                    textAlign: 'right',
+                    fontSize: 12,
+                    fontWeight: 700,
+                    color: tokens.text3,
+                  }}
+                >
+                  {r.accuracyPct === null ? '—' : `${r.accuracyPct}%`}
+                </span>
+                <span
+                  style={{
+                    width: 44,
+                    textAlign: 'right',
+                    fontSize: 12,
+                    fontWeight: 700,
+                    color: tokens.text3,
+                  }}
+                >
+                  {r.streak ? `${r.streak}d` : '—'}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </Card>
   );
 }
