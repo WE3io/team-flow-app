@@ -26,17 +26,28 @@ production; other branches get Vercel preview URLs.
 
 ## 1. Environment
 
-- `DATABASE_URL` — a **Neon Postgres** connection string is available in this
-  cloud environment's env vars. Use the **pooled** connection string at
-  runtime and the **direct** (non-pooled) one as `DIRECT_URL` for migrations
-  (Prisma `directUrl`). If only one URL is provided, derive accordingly
-  (Neon pooled hosts contain `-pooler`).
-- The same `DATABASE_URL`/`DIRECT_URL` must be added to the Vercel project's
-  environment (Production + Preview) for deploys to work — if you cannot do
-  this yourself, list it as a required manual step in your slice-B report.
+Available env vars in the cloud session and what to do with each:
+
+- `NEON_TOKEN` — a **Neon API key**. Administer the database yourself via the
+  Neon API (https://api.neon.tech): create (or reuse) a project + database,
+  and obtain both connection strings. Use the **pooled** string as
+  `DATABASE_URL` at runtime and the **direct** (non-pooled) one as
+  `DIRECT_URL` for migrations (Prisma `directUrl`; Neon pooled hosts contain
+  `-pooler`). Write them to a git-ignored `.env` locally.
+- `VERCEL_TOKEN` — a Vercel API token. Use it to set `DATABASE_URL` /
+  `DIRECT_URL` (and the Sentry DSN, below) on the Vercel project
+  `team-flow-app` for **Production + Preview** environments yourself
+  (`vercel env add … --token` or the REST API), and to check deploy status /
+  logs after pushes.
+- `SENTRY_TOKEN` — a Sentry auth token. See "Extra — error monitoring" below.
+- `CONTEXT7_API_KEY` — for the Context7 docs-lookup tooling available to you
+  as a session; not application scope.
 - Migrations: `prisma migrate dev` locally per migration; production applies
   via `prisma migrate deploy` (add to the Vercel build command:
   `prisma migrate deploy && next build`).
+- **Never commit secrets** — connection strings and DSNs live in `.env`
+  (git-ignored) and Vercel env, nowhere else. (This platform teaches exactly
+  that rule — unit `ai-secrets`.)
 
 ---
 
@@ -182,6 +193,21 @@ increments across a (real or demo-offset) day boundary; badges appear when a
 collection completes; recap shows correct numbers for the trailing 7 days.
 
 ---
+
+## Extra — error monitoring (Sentry)
+
+Small task; do it alongside slice B (that's when server routes appear) or as
+a final pass after D.
+
+- Using `SENTRY_TOKEN`, create (or reuse) a Sentry project via the API and
+  wire `@sentry/nextjs` with its DSN — error monitoring only (client +
+  server), no performance tracing/replay, keep the config minimal.
+- Set the DSN in Vercel env via `VERCEL_TOKEN`; use `SENTRY_TOKEN` for
+  source-map upload in the build if straightforward, otherwise skip
+  source maps and note it.
+- This closes the "no error monitoring" gap flagged at first deploy. It does
+  **not** license product analytics — the seed's measurement prohibitions
+  stand.
 
 ## Out of scope (do not pull forward)
 
