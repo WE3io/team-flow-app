@@ -8,8 +8,8 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  url       = env("DATABASE_URL") // pooled (Neon -pooler host) at runtime
+  directUrl = env("DATABASE_URL_UNPOOLED") // direct host for migrations — name matches the Neon-Vercel integration
 }
 
 model User {
