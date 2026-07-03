@@ -7,11 +7,13 @@ highlights, saved). See `Team_Workflow_Learning_Seed_v0.2.md` (content + design
 governance, **binding** — esp. §6) and `Platform_Build_Handoff_for_Claude_Code.md`
 (build spec).
 
-## Status: Phase 1 (Rendering MVP) — complete, no backend
+## Status: Phase 1 complete + deployed; Phase 2 in progress
 
-Local/in-memory state only. Phases 2–4 (Postgres/Prisma, auth, quizzing, deploy)
-are **not** built yet — do not pull them forward. Stop points are per the
-handoff §2.
+Phase 1 (rendering MVP) is live at https://team-flow-app-lilac.vercel.app —
+pushes to `main` auto-deploy production; branches get Vercel previews.
+Phase 2 work (persistence via Neon Postgres, responsive shell, profile,
+gamification) is specified in **`PHASE2_HANDOFF.md`** — read it before
+touching Phase 2 scope. Quizzing (Phase 3) is still out of scope.
 
 ## Stack
 
