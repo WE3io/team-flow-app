@@ -7,10 +7,10 @@ import {
   grade as gradeStore,
   markSeen as markSeenStore,
   mergeStores,
-  toRows,
-  toggleBookmark as toggleBookmarkStore,
   type ProgressRow,
   type StoredProgress,
+  toggleBookmark as toggleBookmarkStore,
+  toRows,
 } from './store';
 
 /**
@@ -109,10 +109,27 @@ export function useTeamFlowStore(): TeamFlowStore {
     lsSet(K_NAME, name);
   }, []);
 
+  const ensureUser = useCallback(
+    async (force = false): Promise<string | null> => {
+      if (!force && userRef.current) return userRef.current;
+      try {
+        const res = await jsonPost('/api/user', {});
+        if (!res.ok) return null;
+        const data: { id: string; displayName: string } = await res.json();
+        setUser(data.id);
+        setName(data.displayName);
+        return data.id;
+      } catch {
+        return null;
+      }
+    },
+    [setUser, setName],
+  );
+
   /** Push local store + queued events; adopt the server's authoritative rows. */
   const push = useCallback(async (): Promise<boolean> => {
     const id = userRef.current;
-    if (!id || typeof navigator !== 'undefined' && !navigator.onLine) return false;
+    if (!id || (typeof navigator !== 'undefined' && !navigator.onLine)) return false;
     const events = eventsRef.current;
     setSync('syncing');
     try {
@@ -144,27 +161,12 @@ export function useTeamFlowStore(): TeamFlowStore {
       setSync('offline');
       return false;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setStore]);
+  }, [setStore, ensureUser]);
 
   const schedulePush = useCallback(() => {
     if (pushTimer.current) clearTimeout(pushTimer.current);
     pushTimer.current = setTimeout(() => void push(), 700);
   }, [push]);
-
-  const ensureUser = useCallback(async (force = false): Promise<string | null> => {
-    if (!force && userRef.current) return userRef.current;
-    try {
-      const res = await jsonPost('/api/user', {});
-      if (!res.ok) return null;
-      const data: { id: string; displayName: string } = await res.json();
-      setUser(data.id);
-      setName(data.displayName);
-      return data.id;
-    } catch {
-      return null;
-    }
-  }, [setUser, setName]);
 
   // ---------- mutators ----------
   const reveal = useCallback(
@@ -178,7 +180,11 @@ export function useTeamFlowStore(): TeamFlowStore {
   const gradeUnit = useCallback(
     (id: string, g: Grade) => {
       setStore(gradeStore(storeRef.current, id, g, Date.now()));
-      const ev: EventOut = { unitId: id, result: g, at: new Date().toISOString() };
+      const ev: EventOut = {
+        unitId: id,
+        result: g,
+        at: new Date().toISOString(),
+      };
       eventsRef.current = [...eventsRef.current, ev];
       lsSet(K_EVENTS, JSON.stringify(eventsRef.current));
       schedulePush();
@@ -198,7 +204,7 @@ export function useTeamFlowStore(): TeamFlowStore {
     (name: string) => {
       setName(name);
       const id = userRef.current;
-      if (id) void jsonPost('/api/user/' + id + '/name', { displayName: name }).catch(() => {});
+      if (id) void jsonPost(`/api/user/${id}/name`, { displayName: name }).catch(() => {});
     },
     [setName],
   );
@@ -208,7 +214,7 @@ export function useTeamFlowStore(): TeamFlowStore {
     eventsRef.current = [];
     lsDel(K_EVENTS);
     const id = userRef.current;
-    if (id) await jsonPost('/api/user/' + id + '/reset', {}).catch(() => {});
+    if (id) await jsonPost(`/api/user/${id}/reset`, {}).catch(() => {});
   }, [setStore]);
 
   const pairGenerate = useCallback(async () => {
@@ -230,7 +236,11 @@ export function useTeamFlowStore(): TeamFlowStore {
         const res = await jsonPost('/api/pair/claim', { code });
         if (res.status === 404) return 'invalid';
         if (!res.ok) return 'error';
-        const data: { userId: string; displayName: string; progress: ProgressRow[] } = await res.json();
+        const data: {
+          userId: string;
+          displayName: string;
+          progress: ProgressRow[];
+        } = await res.json();
         // Adopt the paired user; server state merges with local unsynced units.
         setUser(data.userId);
         setName(data.displayName);
@@ -246,6 +256,7 @@ export function useTeamFlowStore(): TeamFlowStore {
   );
 
   // ---------- hydration on mount ----------
+  // biome-ignore lint/correctness/useExhaustiveDependencies: mount-only hydration — re-running on callback identity changes would re-pull and re-merge on every render
   useEffect(() => {
     // 1. Load local immediately (offline-first).
     const localStore: StoredProgress = (() => {
@@ -279,7 +290,7 @@ export function useTeamFlowStore(): TeamFlowStore {
       let id = savedId;
       if (id) {
         try {
-          const res = await fetch('/api/user/' + id, { cache: 'no-store' });
+          const res = await fetch(`/api/user/${id}`, { cache: 'no-store' });
           if (res.status === 404) {
             id = await ensureUser(true);
           } else if (res.ok) {
@@ -310,7 +321,6 @@ export function useTeamFlowStore(): TeamFlowStore {
       if (typeof window !== 'undefined') window.removeEventListener('online', onOnline);
       if (pushTimer.current) clearTimeout(pushTimer.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

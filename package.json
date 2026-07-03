@@ -6,13 +6,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "biome check",
     "typecheck": "tsc --noEmit",
     "postinstall": "prisma generate",
     "validate:content": "tsx scripts/validate-content.ts",
     "migrate:seed": "tsx scripts/migrate-seed.ts",
     "db:migrate": "prisma migrate dev",
-    "db:deploy": "prisma migrate deploy"
+    "db:deploy": "prisma migrate deploy",
+    "format": "biome format --write"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
@@ -21,6 +22,7 @@
     "react-dom": "18.3.1"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.5.2",
     "@types/js-yaml": "4.0.9",
     "@types/node": "^20.19.43",
     "@types/react": "^18.3.31",

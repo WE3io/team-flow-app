@@ -1,5 +1,5 @@
-import { loadContent } from '@/lib/content';
 import TeamFlowApp from '@/components/TeamFlowApp';
+import { loadContent } from '@/lib/content';
 
 /**
  * Server component: loads + validates the content bundle at build time, then

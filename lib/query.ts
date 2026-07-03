@@ -16,9 +16,7 @@ export function searchUnits(units: Unit[], query: string): Unit[] {
     (u.carousel || []).some((sl) => `${sl.heading} ${sl.body}`.toLowerCase().includes(q)) ||
     u.topics.some((t) => t.toLowerCase().includes(q)) ||
     u.type.includes(q);
-  return units
-    .filter(match)
-    .sort((a, b) => (b.type === 'runbook' ? 1 : 0) - (a.type === 'runbook' ? 1 : 0));
+  return units.filter(match).sort((a, b) => (b.type === 'runbook' ? 1 : 0) - (a.type === 'runbook' ? 1 : 0));
 }
 
 export function runbookUnits(units: Unit[]): Unit[] {

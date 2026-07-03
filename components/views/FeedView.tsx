@@ -1,10 +1,10 @@
 'use client';
-import type { Unit, Collection } from '@/lib/types';
-import { tokens } from '@/lib/theme';
 import type { Progress } from '@/lib/scheduler';
-import Highlights from '../Highlights';
+import { tokens } from '@/lib/theme';
+import type { Collection, Unit } from '@/lib/types';
 import DueBanner from '../DueBanner';
 import FeedCard from '../FeedCard';
+import Highlights from '../Highlights';
 import SchedulerDemo, { type SchedulerDemoProps } from '../SchedulerDemo';
 import type { UnitActions } from '../UnitActions';
 
@@ -38,8 +38,24 @@ export default function FeedView({
 
   return (
     <div style={{ padding: '4px 0 24px' }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: '8px 18px 10px' }}>
-        <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: -0.8, color: tokens.ink }}>Team Flow</div>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          padding: '8px 18px 10px',
+        }}
+      >
+        <div
+          style={{
+            fontSize: 28,
+            fontWeight: 900,
+            letterSpacing: -0.8,
+            color: tokens.ink,
+          }}
+        >
+          Team Flow
+        </div>
         <div
           style={{
             fontSize: 11,
@@ -61,7 +77,14 @@ export default function FeedView({
 
       {bannerVisible && <DueBanner count={dueCount} onOpen={onOpenDue} />}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '14px 18px 0' }}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 14,
+          padding: '14px 18px 0',
+        }}
+      >
         {feedItems.map((u) => (
           <FeedCard key={u.id} unit={u} collection={byId.get(u.collection)} actions={actions} today={today} />
         ))}

@@ -1,6 +1,6 @@
 'use client';
-import type { Unit } from '@/lib/types';
 import { tokens } from '@/lib/theme';
+import type { Unit } from '@/lib/types';
 
 export default function SavedView({
   units,
@@ -15,9 +15,27 @@ export default function SavedView({
 
   return (
     <div style={{ padding: '8px 18px 24px' }}>
-      <div style={{ fontSize: 24, fontWeight: 900, letterSpacing: -0.5, color: tokens.ink, padding: '8px 0 12px' }}>Saved</div>
+      <div
+        style={{
+          fontSize: 24,
+          fontWeight: 900,
+          letterSpacing: -0.5,
+          color: tokens.ink,
+          padding: '8px 0 12px',
+        }}
+      >
+        Saved
+      </div>
       {saved.length === 0 && (
-        <div style={{ textAlign: 'center', padding: '40px 20px', fontSize: 13, color: tokens.text5, lineHeight: 1.5 }}>
+        <div
+          style={{
+            textAlign: 'center',
+            padding: '40px 20px',
+            fontSize: 13,
+            color: tokens.text5,
+            lineHeight: 1.5,
+          }}
+        >
           Nothing saved yet. Tap “Save” on any card to keep it here.
         </div>
       )}
@@ -37,9 +55,23 @@ export default function SavedView({
               gap: 3,
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}
+            >
               <span style={{ fontSize: 14, fontWeight: 700, color: tokens.ink }}>{u.title}</span>
-              <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: 1, textTransform: 'uppercase', color: tokens.text5 }}>
+              <span
+                style={{
+                  fontSize: 9,
+                  fontWeight: 800,
+                  letterSpacing: 1,
+                  textTransform: 'uppercase',
+                  color: tokens.text5,
+                }}
+              >
                 {u.type}
               </span>
             </div>

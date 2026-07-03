@@ -61,7 +61,13 @@ export default function SchedulerDemo({
           }}
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'baseline',
+                justifyContent: 'space-between',
+              }}
+            >
               <span style={{ fontSize: 12, fontWeight: 700, color: tokens.ink }}>Jump ahead</span>
               <span style={{ fontSize: 12, fontWeight: 800, color: tokens.success }}>
                 {demoOffset === 0 ? 'Today' : `Today +${demoOffset}d`}
@@ -77,7 +83,8 @@ export default function SchedulerDemo({
               style={{ width: '100%', accentColor: tokens.success }}
             />
             <span style={{ fontSize: 11, color: tokens.text3, lineHeight: 1.4 }}>
-              Grade a card “Got it / Not yet”, then jump ahead to see it resurface via the daily-review banner. Offsets the view only — real dates are still stored.
+              Grade a card “Got it / Not yet”, then jump ahead to see it resurface via the daily-review
+              banner. Offsets the view only — real dates are still stored.
             </span>
           </div>
 
@@ -106,12 +113,27 @@ function Toggle({
   onChange: (v: boolean) => void;
 }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        justifyContent: 'space-between',
+        gap: 12,
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+          minWidth: 0,
+        }}
+      >
         <span style={{ fontSize: 12, fontWeight: 700, color: tokens.ink }}>{label}</span>
         {hint && <span style={{ fontSize: 11, color: tokens.text3, lineHeight: 1.35 }}>{hint}</span>}
       </div>
       <button
+        type="button"
         onClick={() => onChange(!value)}
         aria-pressed={value}
         style={{

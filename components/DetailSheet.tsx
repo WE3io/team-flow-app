@@ -1,6 +1,6 @@
 'use client';
-import type { Unit, Collection } from '@/lib/types';
-import { tokens, typeStyle, tierLabel } from '@/lib/theme';
+import { tierLabel, tokens, typeStyle } from '@/lib/theme';
+import type { Collection, Unit } from '@/lib/types';
 import RevealBlock from './RevealBlock';
 import type { UnitActions } from './UnitActions';
 
@@ -42,7 +42,14 @@ export default function DetailSheet({
           overflowY: 'auto',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: 10,
+          }}
+        >
           <span
             style={{
               fontSize: 9,
@@ -57,12 +64,30 @@ export default function DetailSheet({
           >
             {unit.type}
           </span>
-          <span onClick={onClose} style={{ fontSize: 12, fontWeight: 800, color: tokens.text3, cursor: 'pointer', padding: '6px 10px' }}>
+          <span
+            onClick={onClose}
+            style={{
+              fontSize: 12,
+              fontWeight: 800,
+              color: tokens.text3,
+              cursor: 'pointer',
+              padding: '6px 10px',
+            }}
+          >
             Close ✕
           </span>
         </div>
 
-        <div style={{ fontSize: 20, fontWeight: 900, letterSpacing: -0.3, color: tokens.ink, lineHeight: 1.2, marginBottom: 8 }}>
+        <div
+          style={{
+            fontSize: 20,
+            fontWeight: 900,
+            letterSpacing: -0.3,
+            color: tokens.ink,
+            lineHeight: 1.2,
+            marginBottom: 8,
+          }}
+        >
           {unit.title}
         </div>
 
@@ -78,12 +103,25 @@ export default function DetailSheet({
             paddingTop: 12,
           }}
         >
-          <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase', color: tokens.text6 }}>
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: 0.6,
+              textTransform: 'uppercase',
+              color: tokens.text6,
+            }}
+          >
             {collection?.title ?? unit.collection} · {tierLabel(unit.tier)}
           </span>
           <span
             onClick={() => actions.onBookmark(unit.id)}
-            style={{ fontSize: 11, fontWeight: 800, cursor: 'pointer', color: bookmarked ? tokens.success : tokens.text5 }}
+            style={{
+              fontSize: 11,
+              fontWeight: 800,
+              cursor: 'pointer',
+              color: bookmarked ? tokens.success : tokens.text5,
+            }}
           >
             {bookmarked ? 'Saved ✓' : 'Save'}
           </span>

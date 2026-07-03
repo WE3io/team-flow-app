@@ -1,7 +1,7 @@
 'use client';
-import type { Unit, Collection } from '@/lib/types';
-import { tokens, typeStyle } from '@/lib/theme';
 import { isDue } from '@/lib/scheduler';
+import { tokens, typeStyle } from '@/lib/theme';
+import type { Collection, Unit } from '@/lib/types';
 import RevealBlock from './RevealBlock';
 import type { UnitActions } from './UnitActions';
 
@@ -40,7 +40,16 @@ export default function StoryViewer({
   const isLast = viewer.i >= viewer.ids.length - 1;
 
   return (
-    <div style={{ position: 'absolute', inset: 0, background: tokens.ink, zIndex: 50, display: 'flex', flexDirection: 'column' }}>
+    <div
+      style={{
+        position: 'absolute',
+        inset: 0,
+        background: tokens.ink,
+        zIndex: 50,
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
       <div style={{ display: 'flex', gap: 4, padding: '12px 14px 8px' }}>
         {viewer.ids.map((_, i) => (
           <span
@@ -54,14 +63,47 @@ export default function StoryViewer({
           />
         ))}
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 16px 10px' }}>
-        <span style={{ fontSize: 13, fontWeight: 800, color: '#F7F6F2', letterSpacing: 0.4 }}>{viewer.title}</span>
-        <span onClick={onClose} style={{ fontSize: 13, fontWeight: 800, color: '#B8B5A8', cursor: 'pointer', padding: 6 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '4px 16px 10px',
+        }}
+      >
+        <span
+          style={{
+            fontSize: 13,
+            fontWeight: 800,
+            color: '#F7F6F2',
+            letterSpacing: 0.4,
+          }}
+        >
+          {viewer.title}
+        </span>
+        <span
+          onClick={onClose}
+          style={{
+            fontSize: 13,
+            fontWeight: 800,
+            color: '#B8B5A8',
+            cursor: 'pointer',
+            padding: 6,
+          }}
+        >
           ✕
         </span>
       </div>
 
-      <div style={{ flex: 1, minHeight: 0, padding: '4px 16px 16px', display: 'flex', flexDirection: 'column' }}>
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          padding: '4px 16px 16px',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
         <div
           className="no-scrollbar"
           style={{
@@ -107,7 +149,15 @@ export default function StoryViewer({
               </span>
             )}
           </div>
-          <div style={{ fontSize: 20, fontWeight: 900, letterSpacing: -0.3, color: tokens.ink, lineHeight: 1.2 }}>
+          <div
+            style={{
+              fontSize: 20,
+              fontWeight: 900,
+              letterSpacing: -0.3,
+              color: tokens.ink,
+              lineHeight: 1.2,
+            }}
+          >
             {unit.title}
           </div>
           <RevealBlock unit={unit} collColor={collColor} actions={actions} size="lg" />
@@ -115,6 +165,7 @@ export default function StoryViewer({
 
         <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
           <button
+            type="button"
             onClick={onPrev}
             style={{
               flex: 1,
@@ -133,6 +184,7 @@ export default function StoryViewer({
             ← Back
           </button>
           <button
+            type="button"
             onClick={onNext}
             style={{
               flex: 2,

@@ -1,7 +1,7 @@
 'use client';
-import type { Unit } from '@/lib/types';
 import { box, interval } from '@/lib/scheduler';
 import { tokens } from '@/lib/theme';
+import type { Unit } from '@/lib/types';
 import Markdown from './Markdown';
 import type { UnitActions } from './UnitActions';
 
@@ -42,15 +42,36 @@ export default function RevealBlock({
       >
         {hasPrompt ? (
           <>
-            <div style={{ fontSize: promptSize, fontWeight: 600, color: tokens.ink, lineHeight: lineH }}>
+            <div
+              style={{
+                fontSize: promptSize,
+                fontWeight: 600,
+                color: tokens.ink,
+                lineHeight: lineH,
+              }}
+            >
               {unit.prompt}
             </div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: tokens.text3, fontStyle: 'italic' }}>
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                color: tokens.text3,
+                fontStyle: 'italic',
+              }}
+            >
               Think of your answer first.
             </div>
           </>
         ) : (
-          <div style={{ fontSize: promptSize, fontWeight: 600, color: tokens.text2, lineHeight: lineH }}>
+          <div
+            style={{
+              fontSize: promptSize,
+              fontWeight: 600,
+              color: tokens.text2,
+              lineHeight: lineH,
+            }}
+          >
             {unit.hook}
           </div>
         )}
@@ -114,13 +135,10 @@ export default function RevealBlock({
 
       {!graded ? (
         <div style={{ display: 'flex', gap: 8, marginTop: 2 }}>
-          <button
-            onClick={() => actions.onGrade(unit.id, 'again')}
-            style={gradeBtn(false)}
-          >
+          <button type="button" onClick={() => actions.onGrade(unit.id, 'again')} style={gradeBtn(false)}>
             Not yet
           </button>
-          <button onClick={() => actions.onGrade(unit.id, 'good')} style={gradeBtn(true)}>
+          <button type="button" onClick={() => actions.onGrade(unit.id, 'good')} style={gradeBtn(true)}>
             Got it
           </button>
         </div>
@@ -175,12 +193,22 @@ function Carousel({ unit, actions }: { unit: Unit; actions: UnitActions }) {
         gap: 6,
       }}
     >
-      {slide.heading && <div style={{ fontSize: 14, fontWeight: 800, color: tokens.ink }}>{slide.heading}</div>}
+      {slide.heading && (
+        <div style={{ fontSize: 14, fontWeight: 800, color: tokens.ink }}>{slide.heading}</div>
+      )}
       <div style={{ fontSize: 13, color: tokens.text2, lineHeight: 1.5 }}>
         <Markdown>{slide.body}</Markdown>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 6 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginTop: 6,
+        }}
+      >
         <button
+          type="button"
           onClick={() => actions.onSlide(unit.id, -1, len)}
           style={{
             fontSize: 11,
@@ -201,6 +229,7 @@ function Carousel({ unit, actions }: { unit: Unit; actions: UnitActions }) {
           {idx + 1} / {len}
         </span>
         <button
+          type="button"
           onClick={() => actions.onSlide(unit.id, 1, len)}
           style={{
             fontSize: 11,
@@ -229,8 +258,7 @@ function ReelPlaceholder({ text }: { text: string }) {
         borderRadius: 12,
         border: `1px solid ${tokens.hairline}`,
         minHeight: 160,
-        background:
-          'repeating-linear-gradient(45deg, #EFEDE6, #EFEDE6 8px, #E6E3DA 8px, #E6E3DA 16px)',
+        background: 'repeating-linear-gradient(45deg, #EFEDE6, #EFEDE6 8px, #E6E3DA 8px, #E6E3DA 16px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',

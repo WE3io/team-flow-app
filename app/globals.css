@@ -31,6 +31,7 @@ body {
 }
 .app-shell {
   min-height: 100vh;
+  /* biome-ignore lint/suspicious/noDuplicateProperties: dvh with vh fallback for older browsers */
   min-height: 100dvh;
   display: flex;
   justify-content: center;
@@ -41,6 +42,7 @@ body {
   width: 100%;
   max-width: 768px;
   height: 100vh;
+  /* biome-ignore lint/suspicious/noDuplicateProperties: dvh with vh fallback for older browsers */
   height: 100dvh;
   display: flex;
   flex-direction: column;

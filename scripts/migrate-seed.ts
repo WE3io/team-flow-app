@@ -11,9 +11,9 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import yaml from 'js-yaml';
 import matter from 'gray-matter';
-import { UnitSchema, CollectionSchema, type Unit } from '../lib/types';
+import yaml from 'js-yaml';
+import { CollectionSchema, type Unit, UnitSchema } from '../lib/types';
 
 const ROOT = path.resolve(__dirname, '..');
 const SEED = path.join(ROOT, 'Team_Workflow_Learning_Seed_v0.2.md');
@@ -36,9 +36,7 @@ function section(src: string, startHeading: string, endHeading: string): string 
 // ---------- collections (seed §4) ----------
 function parseCollections(src: string) {
   const region = section(src, '## 4. Information architecture', '### Three access modes');
-  const rows = region
-    .split('\n')
-    .filter((l) => /^\|\s*\d+\s*\|/.test(l)); // table body rows only
+  const rows = region.split('\n').filter((l) => /^\|\s*\d+\s*\|/.test(l)); // table body rows only
   const collections = rows.map((row) => {
     const cells = row.split('|').map((c) => c.trim());
     // cells: ['', '1', 'Start Here (`start-here`)', 'all', 'covers…', '']
@@ -69,13 +67,19 @@ function splitUnitBlocks(region: string): string[] {
   const fenceRe = /```yaml\s*\n([\s\S]*?)\n```/g;
   const matches: { yaml: string; index: number; endYaml: number }[] = [];
   let m: RegExpExecArray | null;
+  // biome-ignore lint/suspicious/noAssignInExpressions: idiomatic RegExp.exec iteration
   while ((m = fenceRe.exec(region))) {
     matches.push({ yaml: m[1], index: m.index, endYaml: fenceRe.lastIndex });
   }
   matches.forEach((cur, i) => {
     const contentStart = cur.endYaml;
     const contentEnd = i + 1 < matches.length ? matches[i + 1].index : region.length;
-    parts.push(JSON.stringify({ yaml: cur.yaml, content: region.slice(contentStart, contentEnd) }));
+    parts.push(
+      JSON.stringify({
+        yaml: cur.yaml,
+        content: region.slice(contentStart, contentEnd),
+      }),
+    );
   });
   return parts;
 }
@@ -89,7 +93,7 @@ function parseCarousel(raw: string) {
       if (current !== null) items.push(splitSlide(current));
       current = numbered[1];
     } else if (current !== null && line.trim()) {
-      current += ' ' + line.trim();
+      current += ` ${line.trim()}`;
     }
   }
   if (current !== null) items.push(splitSlide(current));
@@ -114,7 +118,7 @@ function parseUnitContent(content: string): Record<string, unknown> {
       currentLabel = label;
       fields[label] = fm[2];
     } else if (currentLabel) {
-      fields[currentLabel] += '\n' + line;
+      fields[currentLabel] += `\n${line}`;
     }
   }
 
@@ -143,7 +147,10 @@ function parseUnits(src: string): Unit[] {
   const blocks = splitUnitBlocks(region);
   const seen = new Set<string>();
   return blocks.map((packed, i) => {
-    const { yaml: yamlText, content } = JSON.parse(packed) as { yaml: string; content: string };
+    const { yaml: yamlText, content } = JSON.parse(packed) as {
+      yaml: string;
+      content: string;
+    };
     const meta = yaml.load(yamlText) as Record<string, unknown>;
     const merged = { order: i, ...meta, ...parseUnitContent(content) };
     const parsed = UnitSchema.safeParse(merged);
@@ -161,7 +168,7 @@ function toMdx(unit: Unit): string {
   // the human-readable markdown body for easy editing/diffing.
   const { body, ...front } = unit;
   const fm = matter.stringify(body ? `\n${body}\n` : '\n', front).trimStart();
-  return fm.endsWith('\n') ? fm : fm + '\n';
+  return fm.endsWith('\n') ? fm : `${fm}\n`;
 }
 
 function main() {
@@ -183,7 +190,7 @@ function main() {
     fs.writeFileSync(path.join(UNITS_DIR, `${u.id}.mdx`), toMdx(u), 'utf8');
   }
   fs.mkdirSync(path.dirname(COLLECTIONS_OUT), { recursive: true });
-  fs.writeFileSync(COLLECTIONS_OUT, JSON.stringify(collections, null, 2) + '\n', 'utf8');
+  fs.writeFileSync(COLLECTIONS_OUT, `${JSON.stringify(collections, null, 2)}\n`, 'utf8');
 
   console.log(`✓ migrate-seed: wrote ${units.length} units and ${collections.length} collections`);
   const byColl = collections

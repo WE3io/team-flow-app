@@ -1,8 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
-import { UnitSchema, CollectionSchema, type Unit, type SeedCollection, type Collection } from './types';
 import { decorateCollections } from './collections';
+import { type Collection, CollectionSchema, type SeedCollection, type Unit, UnitSchema } from './types';
 
 /**
  * Pure content loader + validator (no server-only, no cache) so it can run
@@ -30,7 +30,10 @@ export function loadContentBundle(root: string): ContentBundle {
   const collections = decorateCollections(seedCollections);
   const collectionIds = new Set(collections.map((c) => c.id));
 
-  const files = fs.readdirSync(unitsDir).filter((f) => f.endsWith('.mdx')).sort();
+  const files = fs
+    .readdirSync(unitsDir)
+    .filter((f) => f.endsWith('.mdx'))
+    .sort();
   const seen = new Set<string>();
   const units: Unit[] = files.map((file) => {
     const src = fs.readFileSync(path.join(unitsDir, file), 'utf8');

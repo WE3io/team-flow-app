@@ -1,4 +1,4 @@
-import { interval, MAX_BOX, type Grade, type Progress } from './scheduler';
+import { type Grade, interval, MAX_BOX, type Progress } from './scheduler';
 
 /**
  * Local-first progress store (PHASE2_HANDOFF §Slice B).
@@ -39,7 +39,15 @@ export function computeDueMs(lastSeenAtMs: number, box: number): number {
 }
 
 function ensure(u: StoredUnit | undefined): StoredUnit {
-  return u ?? { box: 1, lastSeenAtMs: 0, dueAtMs: 0, seenCount: 0, bookmarked: false };
+  return (
+    u ?? {
+      box: 1,
+      lastSeenAtMs: 0,
+      dueAtMs: 0,
+      seenCount: 0,
+      bookmarked: false,
+    }
+  );
 }
 
 /** First reveal: create/upgrade a row to "seen" without grading it. */

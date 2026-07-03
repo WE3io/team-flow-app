@@ -1,7 +1,7 @@
 import 'server-only';
 import { PrismaClient, type UnitProgress } from '@prisma/client';
-import type { ProgressRow } from './store';
 import type { Grade } from './scheduler';
+import type { ProgressRow } from './store';
 
 /**
  * Prisma client singleton (Next.js dev-friendly — one instance across HMR).

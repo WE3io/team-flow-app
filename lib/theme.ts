@@ -1,4 +1,4 @@
-import type { UnitType, Tier } from './types';
+import type { Tier, UnitType } from './types';
 
 /**
  * Design tokens — "quiet tool, loud progress". Calm hairline surfaces, colour

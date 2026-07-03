@@ -1,7 +1,7 @@
 'use client';
-import type { Unit } from '@/lib/types';
+import { runbookUnits, searchUnits } from '@/lib/query';
 import { tokens, typeStyle } from '@/lib/theme';
-import { searchUnits, runbookUnits } from '@/lib/query';
+import type { Unit } from '@/lib/types';
 
 export default function SearchView({
   units,
@@ -20,7 +20,17 @@ export default function SearchView({
 
   return (
     <div style={{ padding: '8px 18px 24px' }}>
-      <div style={{ fontSize: 24, fontWeight: 900, letterSpacing: -0.5, color: tokens.ink, padding: '8px 0 12px' }}>Search</div>
+      <div
+        style={{
+          fontSize: 24,
+          fontWeight: 900,
+          letterSpacing: -0.5,
+          color: tokens.ink,
+          padding: '8px 0 12px',
+        }}
+      >
+        Search
+      </div>
       <input
         value={query}
         onChange={(e) => onQuery(e.target.value)}
@@ -41,7 +51,16 @@ export default function SearchView({
 
       {q.length === 0 ? (
         <div style={{ marginTop: 18 }}>
-          <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: 1.2, textTransform: 'uppercase', color: tokens.runbook, marginBottom: 10 }}>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 800,
+              letterSpacing: 1.2,
+              textTransform: 'uppercase',
+              color: tokens.runbook,
+              marginBottom: 10,
+            }}
+          >
             Git just broke? Start here
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -61,7 +80,15 @@ export default function SearchView({
                 }}
               >
                 <span style={{ fontSize: 14, fontWeight: 700, color: tokens.ink }}>{u.title}</span>
-                <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: 1, textTransform: 'uppercase', color: tokens.runbook }}>
+                <span
+                  style={{
+                    fontSize: 9,
+                    fontWeight: 800,
+                    letterSpacing: 1,
+                    textTransform: 'uppercase',
+                    color: tokens.runbook,
+                  }}
+                >
                   Runbook
                 </span>
               </div>
@@ -69,7 +96,14 @@ export default function SearchView({
           </div>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 16 }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+            marginTop: 16,
+          }}
+        >
           {results.map((u) => {
             const ts = typeStyle(u.type);
             const rb = u.type === 'runbook';
@@ -88,9 +122,23 @@ export default function SearchView({
                   gap: 3,
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
                   <span style={{ fontSize: 14, fontWeight: 700, color: tokens.ink }}>{u.title}</span>
-                  <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: 1, textTransform: 'uppercase', color: ts.color }}>
+                  <span
+                    style={{
+                      fontSize: 9,
+                      fontWeight: 800,
+                      letterSpacing: 1,
+                      textTransform: 'uppercase',
+                      color: ts.color,
+                    }}
+                  >
                     {u.type}
                   </span>
                 </div>
@@ -99,7 +147,16 @@ export default function SearchView({
             );
           })}
           {results.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '24px 0', fontSize: 13, color: tokens.text5 }}>No units match.</div>
+            <div
+              style={{
+                textAlign: 'center',
+                padding: '24px 0',
+                fontSize: 13,
+                color: tokens.text5,
+              }}
+            >
+              No units match.
+            </div>
           )}
         </div>
       )}

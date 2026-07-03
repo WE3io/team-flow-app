@@ -1,5 +1,5 @@
+import { randomBytes } from 'node:crypto';
 import { NextResponse } from 'next/server';
-import { randomBytes } from 'crypto';
 import { prisma } from '@/lib/db';
 
 export const runtime = 'nodejs';

@@ -3,8 +3,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'Team Flow',
-  description:
-    'Snackable, mobile-first learning for our Git / trunk-based / AI-assisted workflow.',
+  description: 'Snackable, mobile-first learning for our Git / trunk-based / AI-assisted workflow.',
 };
 
 export const viewport: Viewport = {

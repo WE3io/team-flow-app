@@ -53,7 +53,15 @@ export default function DueBanner({ count, onOpen }: { count: number; onOpen: ()
         </div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
-        <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: 1.2, textTransform: 'uppercase', color: '#8B887B' }}>
+        <span
+          style={{
+            fontSize: 10,
+            fontWeight: 800,
+            letterSpacing: 1.2,
+            textTransform: 'uppercase',
+            color: '#8B887B',
+          }}
+        >
           Daily review
         </span>
         <span style={{ fontSize: 14, fontWeight: 700 }}>

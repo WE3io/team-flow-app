@@ -79,7 +79,16 @@ export default function Markdown({ children, style }: { children: string; style?
       {blocks.map((b, i) => {
         if (b.kind === 'ul') {
           return (
-            <ul key={i} style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <ul
+              key={i}
+              style={{
+                margin: 0,
+                paddingLeft: 18,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 4,
+              }}
+            >
               {b.items.map((it, j) => (
                 <li key={j}>{inline(it, `${i}-${j}`)}</li>
               ))}
@@ -88,7 +97,16 @@ export default function Markdown({ children, style }: { children: string; style?
         }
         if (b.kind === 'ol') {
           return (
-            <ol key={i} style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <ol
+              key={i}
+              style={{
+                margin: 0,
+                paddingLeft: 20,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 4,
+              }}
+            >
               {b.items.map((it, j) => (
                 <li key={j}>{inline(it, `${i}-${j}`)}</li>
               ))}

@@ -80,12 +80,17 @@ export async function POST(req: Request) {
   }
 
   const validEvents = events.filter(
-    (e) => e && e.unitId && (e.result === 'good' || e.result === 'again') && !Number.isNaN(Date.parse(e.at)),
+    (e) => e?.unitId && (e.result === 'good' || e.result === 'again') && !Number.isNaN(Date.parse(e.at)),
   );
   if (validEvents.length) {
     writes.push(
       prisma.reviewEvent.createMany({
-        data: validEvents.map((e) => ({ userId, unitId: e.unitId, result: e.result, at: new Date(e.at) })),
+        data: validEvents.map((e) => ({
+          userId,
+          unitId: e.unitId,
+          result: e.result,
+          at: new Date(e.at),
+        })),
       }),
     );
   }

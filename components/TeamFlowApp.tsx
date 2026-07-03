@@ -1,18 +1,18 @@
 'use client';
 import { useMemo, useState } from 'react';
-import type { Unit, Collection } from '@/lib/types';
 import { computeFeed, dueUnits, type Grade } from '@/lib/scheduler';
-import { toSchedulerProgress, bookmarkMap, DAY_MS } from '@/lib/store';
+import { bookmarkMap, DAY_MS, toSchedulerProgress } from '@/lib/store';
 import { useTeamFlowStore } from '@/lib/sync';
+import type { Collection, Unit } from '@/lib/types';
 import BottomNav, { type TabKey } from './BottomNav';
-import FeedView from './views/FeedView';
-import PathView from './views/PathView';
-import SearchView from './views/SearchView';
-import SavedView from './views/SavedView';
-import LibraryView from './views/LibraryView';
 import DetailSheet from './DetailSheet';
 import StoryViewer, { type ViewerState } from './StoryViewer';
 import type { UnitActions } from './UnitActions';
+import FeedView from './views/FeedView';
+import LibraryView from './views/LibraryView';
+import PathView from './views/PathView';
+import SavedView from './views/SavedView';
+import SearchView from './views/SearchView';
 
 // The Scheduler-demo control ships only when explicitly enabled (handoff §Slice
 // B) — it offsets "today" client-side to review Leitner behaviour on previews.
@@ -61,7 +61,10 @@ export default function TeamFlowApp({ units, collections }: { units: Unit[]; col
       setRevealed((r) => ({ ...r, [id]: true }));
     },
     onSlide: (id, dir, len) =>
-      setSlides((s) => ({ ...s, [id]: Math.max(0, Math.min(len - 1, (s[id] ?? 0) + dir)) })),
+      setSlides((s) => ({
+        ...s,
+        [id]: Math.max(0, Math.min(len - 1, (s[id] ?? 0) + dir)),
+      })),
     onBookmark: (id) => flow.bookmark(id),
     openDetail,
   };
@@ -88,8 +91,25 @@ export default function TeamFlowApp({ units, collections }: { units: Unit[]; col
   const viewerPrev = () => setViewer((v) => (!v || v.i === 0 ? v : { ...v, i: v.i - 1 }));
 
   return (
-    <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
-      <div className="no-scrollbar" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden' }}>
+    <div
+      style={{
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        flex: 1,
+        minHeight: 0,
+        overflow: 'hidden',
+      }}
+    >
+      <div
+        className="no-scrollbar"
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: 'auto',
+          overflowX: 'hidden',
+        }}
+      >
         {tab === 'feed' && (
           <FeedView
             units={units}
@@ -116,8 +136,12 @@ export default function TeamFlowApp({ units, collections }: { units: Unit[]; col
             }
           />
         )}
-        {tab === 'path' && <PathView units={units} progress={progress} revealed={revealed} openDetail={openDetail} />}
-        {tab === 'search' && <SearchView units={units} query={query} onQuery={setQuery} openDetail={openDetail} />}
+        {tab === 'path' && (
+          <PathView units={units} progress={progress} revealed={revealed} openDetail={openDetail} />
+        )}
+        {tab === 'search' && (
+          <SearchView units={units} query={query} onQuery={setQuery} openDetail={openDetail} />
+        )}
         {tab === 'saved' && <SavedView units={units} bookmarks={bookmarks} openDetail={openDetail} />}
         {tab === 'library' && (
           <LibraryView
@@ -131,7 +155,13 @@ export default function TeamFlowApp({ units, collections }: { units: Unit[]; col
         )}
       </div>
 
-      <BottomNav tab={tab} onTab={(t) => { setTab(t); setDetail(null); }} />
+      <BottomNav
+        tab={tab}
+        onTab={(t) => {
+          setTab(t);
+          setDetail(null);
+        }}
+      />
 
       {detailUnit && (
         <DetailSheet

@@ -16,7 +16,10 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   const name = (displayName ?? '').trim().slice(0, 40);
   if (!name) return NextResponse.json({ error: 'bad-request' }, { status: 400 });
   try {
-    const user = await prisma.user.update({ where: { id: params.id }, data: { displayName: name } });
+    const user = await prisma.user.update({
+      where: { id: params.id },
+      data: { displayName: name },
+    });
     return NextResponse.json({ id: user.id, displayName: user.displayName });
   } catch {
     return NextResponse.json({ error: 'not-found' }, { status: 404 });

@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     where: { pairingCode: code.trim().toUpperCase() },
     include: { progress: true },
   });
-  if (!user || !user.pairingExpiry || user.pairingExpiry.getTime() < Date.now()) {
+  if (!user?.pairingExpiry || user.pairingExpiry.getTime() < Date.now()) {
     return NextResponse.json({ error: 'invalid-or-expired' }, { status: 404 });
   }
 
