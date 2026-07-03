@@ -1,7 +1,7 @@
 'use client';
-import type { Unit, Collection } from '@/lib/types';
-import { tokens, typeStyle, tierLabel } from '@/lib/theme';
 import { isDue } from '@/lib/scheduler';
+import { buttonReset, tierLabel, tokens, typeStyle } from '@/lib/theme';
+import type { Collection, Unit } from '@/lib/types';
 import RevealBlock from './RevealBlock';
 import type { UnitActions } from './UnitActions';
 
@@ -9,16 +9,16 @@ export default function FeedCard({
   unit,
   collection,
   actions,
-  simDay,
+  today,
 }: {
   unit: Unit;
   collection?: Collection;
   actions: UnitActions;
-  simDay: number;
+  today: number;
 }) {
   const ts = typeStyle(unit.type);
   const collColor = collection?.color ?? tokens.ink;
-  const due = isDue(actions.progress, unit.id, simDay);
+  const due = isDue(actions.progress, unit.id, today);
   const bookmarked = !!actions.bookmarks[unit.id];
 
   return (
@@ -49,7 +49,15 @@ export default function FeedCard({
         >
           {unit.type}
         </span>
-        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.8, textTransform: 'uppercase', color: tokens.text5 }}>
+        <span
+          style={{
+            fontSize: 9,
+            fontWeight: 700,
+            letterSpacing: 0.8,
+            textTransform: 'uppercase',
+            color: tokens.text5,
+          }}
+        >
           {tierLabel(unit.tier)}
         </span>
         {due && (
@@ -69,21 +77,31 @@ export default function FeedCard({
           </span>
         )}
         <div style={{ flex: 1 }} />
-        <span
+        <button
+          type="button"
           onClick={() => actions.onBookmark(unit.id)}
+          aria-pressed={bookmarked}
           style={{
+            ...buttonReset,
             fontSize: 10,
             fontWeight: 800,
             letterSpacing: 0.6,
-            cursor: 'pointer',
             color: bookmarked ? tokens.success : tokens.text5,
           }}
         >
           {bookmarked ? 'Saved ✓' : 'Save'}
-        </span>
+        </button>
       </div>
 
-      <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: -0.2, color: tokens.ink, lineHeight: 1.25 }}>
+      <div
+        style={{
+          fontSize: 17,
+          fontWeight: 800,
+          letterSpacing: -0.2,
+          color: tokens.ink,
+          lineHeight: 1.25,
+        }}
+      >
         {unit.title}
       </div>
 
@@ -98,8 +116,23 @@ export default function FeedCard({
           paddingTop: 9,
         }}
       >
-        <span style={{ width: 7, height: 7, borderRadius: 50, background: collColor }} />
-        <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: 0.8, textTransform: 'uppercase', color: collColor }}>
+        <span
+          style={{
+            width: 7,
+            height: 7,
+            borderRadius: 50,
+            background: collColor,
+          }}
+        />
+        <span
+          style={{
+            fontSize: 10,
+            fontWeight: 800,
+            letterSpacing: 0.8,
+            textTransform: 'uppercase',
+            color: collColor,
+          }}
+        >
           {collection?.title ?? unit.collection}
         </span>
       </div>

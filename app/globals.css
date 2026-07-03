@@ -21,91 +21,42 @@ body {
   scrollbar-width: none;
 }
 
-/* ---------- Phone frame ---------- */
-.phone-frame {
-  position: relative;
+/* ---------- App shell ----------
+   Full-viewport web app, constrained to a centred tablet-width column. The
+   canvas colour fills the space around the column; the column carries the
+   unchanged mobile-first layout. */
+html,
+body {
+  height: 100%;
+}
+.app-shell {
+  min-height: 100vh;
+  /* biome-ignore lint/suspicious/noDuplicateProperties: dvh with vh fallback for older browsers */
+  min-height: 100dvh;
   display: flex;
-  flex-direction: column;
-  width: 100vw;
+  justify-content: center;
+  background: #f6f1e4; /* tokens.canvas — fills the space outside the column */
+}
+.app-column {
+  position: relative;
+  width: 100%;
+  max-width: 768px;
   height: 100vh;
+  /* biome-ignore lint/suspicious/noDuplicateProperties: dvh with vh fallback for older browsers */
   height: 100dvh;
-  background: #f6f1e4;
-  overflow: hidden;
-}
-.phone-island,
-.phone-home {
-  display: none;
-}
-.phone-statusbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 24px 6px;
-  flex: 0 0 auto;
-  background: #f6f1e4;
-}
-.phone-time {
-  font-size: 15px;
-  font-weight: 700;
-  color: #16150f;
-  letter-spacing: -0.2px;
-}
-.phone-status-icons {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.phone-screen {
-  position: relative;
-  flex: 1;
-  min-height: 0;
   display: flex;
   flex-direction: column;
-  background: #f6f1e4;
+  background: #f6f1e4; /* tokens.canvas */
+  /* Top safe-area: the status bar used to provide this gap (standalone only). */
+  padding-top: env(safe-area-inset-top, 0px);
   overflow: hidden;
 }
 
-/* On larger screens, show a centred device bezel. */
-@media (min-width: 480px) {
-  .phone-frame {
-    width: 402px;
-    height: min(880px, 94vh);
-    border-radius: 52px;
-    box-shadow:
-      0 40px 90px rgba(0, 0, 0, 0.22),
-      0 0 0 1px rgba(0, 0, 0, 0.1),
-      0 0 0 12px #1b1a15,
-      0 0 0 14px #2c2a22;
-  }
-  .phone-statusbar {
-    padding-top: 20px;
-  }
-  .phone-island {
-    display: block;
-    position: absolute;
-    top: 11px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 118px;
-    height: 34px;
-    border-radius: 20px;
-    background: #000;
-    z-index: 60;
-  }
-  .phone-home {
-    display: block;
-    position: absolute;
-    bottom: 8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 132px;
-    height: 5px;
-    border-radius: 100px;
-    background: rgba(0, 0, 0, 0.22);
-    z-index: 60;
-    pointer-events: none;
-  }
-  .phone-screen {
-    padding-bottom: 14px;
+/* On screens wider than the column, delineate it with hairline edges so it
+   reads as a deliberate column rather than left-over margin. */
+@media (min-width: 768px) {
+  .app-column {
+    border-left: 1px solid #e8e4d8; /* tokens.hairline */
+    border-right: 1px solid #e8e4d8;
   }
 }

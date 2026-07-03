@@ -1,7 +1,7 @@
 'use client';
-import type { Unit, Collection } from '@/lib/types';
-import { tokens } from '@/lib/theme';
-import { seen, type Progress } from '@/lib/scheduler';
+import { type Progress, seen } from '@/lib/scheduler';
+import { buttonReset, tokens } from '@/lib/theme';
+import type { Collection, Unit } from '@/lib/types';
 
 /**
  * Collections as Instagram-style Highlights (handoff §5). The ring is a real
@@ -34,15 +34,16 @@ export default function Highlights({
         const covered = us.filter((u) => seen(progress, u.id)).length;
         const pct = Math.round((covered / Math.max(1, us.length)) * 100);
         return (
-          <div
+          <button
+            type="button"
             key={c.id}
             onClick={() => onOpen(c)}
             style={{
+              ...buttonReset,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               gap: 6,
-              cursor: 'pointer',
               flex: '0 0 auto',
               width: 68,
             }}
@@ -62,7 +63,7 @@ export default function Highlights({
                   width: '100%',
                   height: '100%',
                   borderRadius: '50%',
-                  background: c.color + '1A',
+                  background: `${c.color}1A`,
                   border: '2px solid #FFFFFF',
                   boxSizing: 'border-box',
                   display: 'flex',
@@ -73,10 +74,18 @@ export default function Highlights({
                 <span style={{ fontSize: 18, fontWeight: 900, color: c.color }}>{c.letter}</span>
               </div>
             </div>
-            <span style={{ fontSize: 10, fontWeight: 600, color: tokens.text2, textAlign: 'center', lineHeight: 1.2 }}>
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 600,
+                color: tokens.text2,
+                textAlign: 'center',
+                lineHeight: 1.2,
+              }}
+            >
               {c.title}
             </span>
-          </div>
+          </button>
         );
       })}
     </div>

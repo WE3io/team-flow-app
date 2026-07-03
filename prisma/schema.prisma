@@ -1,0 +1,48 @@
+// Team Flow — Phase 2 persistence (PHASE2_HANDOFF.md §Slice B).
+// Anonymous users + pairing code. Keep this model small; ReviewEvent exists to
+// compute retrieval accuracy, streaks and the weekly recap (slices C/D).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL") // pooled (Neon -pooler host) at runtime
+  directUrl = env("DATABASE_URL_UNPOOLED") // direct host for migrations — name matches the Neon-Vercel integration
+}
+
+model User {
+  id            String    @id @default(cuid())
+  displayName   String    @default("Anonymous")
+  createdAt     DateTime  @default(now())
+  pairingCode   String?   @unique // short-lived claim code, nullable
+  pairingExpiry DateTime?
+  progress      UnitProgress[]
+  events        ReviewEvent[]
+}
+
+model UnitProgress {
+  userId     String
+  unitId     String
+  box        Int      @default(1)
+  lastSeenAt DateTime
+  dueAt      DateTime
+  lastResult String? // 'good' | 'again'
+  seenCount  Int      @default(0)
+  bookmarked Boolean  @default(false)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, unitId])
+}
+
+model ReviewEvent {
+  id     String   @id @default(cuid())
+  userId String
+  unitId String
+  result String // 'good' | 'again'
+  at     DateTime @default(now())
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, at])
+}

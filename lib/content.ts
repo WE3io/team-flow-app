@@ -1,5 +1,5 @@
 import 'server-only';
-import { loadContentBundle, type ContentBundle } from './bundle';
+import { type ContentBundle, loadContentBundle } from './bundle';
 
 /**
  * Server-side entry point for content. Validates at build time (via

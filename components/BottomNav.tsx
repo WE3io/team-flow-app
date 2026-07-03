@@ -1,5 +1,5 @@
 'use client';
-import { tokens } from '@/lib/theme';
+import { buttonReset, tokens } from '@/lib/theme';
 
 export type TabKey = 'feed' | 'path' | 'search' | 'saved' | 'library';
 
@@ -18,20 +18,23 @@ export default function BottomNav({ tab, onTab }: { tab: TabKey; onTab: (t: TabK
         display: 'flex',
         borderTop: `1px solid ${tokens.hairline}`,
         background: '#FFFFFF',
-        padding: '10px 8px 6px',
+        // Bottom safe-area padding: the phone frame used to provide this gap.
+        padding: '10px 8px calc(6px + env(safe-area-inset-bottom, 0px))',
         flex: '0 0 auto',
       }}
     >
       {NAV.map((n) => {
         const active = tab === n.key;
         return (
-          <div
+          <button
+            type="button"
             key={n.key}
             onClick={() => onTab(n.key)}
+            aria-current={active ? 'page' : undefined}
             style={{
+              ...buttonReset,
               flex: 1,
               textAlign: 'center',
-              cursor: 'pointer',
               padding: '6px 0',
               display: 'flex',
               flexDirection: 'column',
@@ -52,7 +55,7 @@ export default function BottomNav({ tab, onTab }: { tab: TabKey; onTab: (t: TabK
             >
               {n.label}
             </span>
-          </div>
+          </button>
         );
       })}
     </div>

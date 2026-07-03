@@ -1,41 +1,67 @@
 'use client';
 import { useMemo, useState } from 'react';
-import type { Unit, Collection } from '@/lib/types';
-import {
-  emptyProgress,
-  markSeen,
-  grade as gradeProgress,
-  computeFeed,
-  dueUnits,
-  type Grade,
-  type Progress,
-} from '@/lib/scheduler';
+import { computeFeed, dueUnits, type Grade } from '@/lib/scheduler';
+import { computeStreaks } from '@/lib/stats';
+import { bookmarkMap, DAY_MS, dayIndex, toSchedulerProgress } from '@/lib/store';
+import { useTeamFlowStore } from '@/lib/sync';
+import type { Collection, Unit } from '@/lib/types';
 import BottomNav, { type TabKey } from './BottomNav';
-import FeedView from './views/FeedView';
-import PathView from './views/PathView';
-import SearchView from './views/SearchView';
-import SavedView from './views/SavedView';
-import LibraryView from './views/LibraryView';
 import DetailSheet from './DetailSheet';
+import ProfilePanel from './ProfilePanel';
 import StoryViewer, { type ViewerState } from './StoryViewer';
 import type { UnitActions } from './UnitActions';
+import FeedView from './views/FeedView';
+import LibraryView from './views/LibraryView';
+import PathView from './views/PathView';
+import SavedView from './views/SavedView';
+import SearchView from './views/SearchView';
+
+// The Scheduler-demo control ships only when explicitly enabled (handoff §Slice
+// B) — it offsets "today" client-side to review Leitner behaviour on previews.
+const SCHEDULER_DEMO = process.env.NEXT_PUBLIC_SCHEDULER_DEMO === '1';
 
 export default function TeamFlowApp({ units, collections }: { units: Unit[]; collections: Collection[] }) {
+  const flow = useTeamFlowStore();
+
   const [tab, setTab] = useState<TabKey>('feed');
   const [revealed, setRevealed] = useState<Record<string, boolean>>({});
   const [slides, setSlides] = useState<Record<string, number>>({});
-  const [bookmarks, setBookmarks] = useState<Record<string, boolean>>({});
-  const [progress, setProgress] = useState<Progress>(emptyProgress());
   const [query, setQuery] = useState('');
   const [tierFilter, setTierFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
   const [detail, setDetail] = useState<string | null>(null);
   const [viewer, setViewer] = useState<ViewerState | null>(null);
+  const [profileOpen, setProfileOpen] = useState(false);
 
-  // Scheduler demo controls (Phase 1 stand-in for real time + persistence).
-  const [simDay, setSimDay] = useState(0);
+  // Scheduler-demo lens (gated behind the env flag; lives in profile settings).
+  const [demoOffset, setDemoOffset] = useState(0);
   const [showDueBanner, setShowDueBanner] = useState(true);
   const [noviceOrdering, setNoviceOrdering] = useState(true);
+  const demo = SCHEDULER_DEMO
+    ? {
+        demoOffset,
+        onDemoOffset: setDemoOffset,
+        showDueBanner,
+        onShowDueBanner: setShowDueBanner,
+        noviceOrdering,
+        onNoviceOrdering: setNoviceOrdering,
+      }
+    : null;
+
+  // Real time at day granularity replaces Phase-1 simDay; the demo offset (when
+  // enabled) shifts only the lens, never the stored dates.
+  const today = Math.floor(Date.now() / DAY_MS) + (SCHEDULER_DEMO ? demoOffset : 0);
+
+  const progress = useMemo(() => toSchedulerProgress(flow.store), [flow.store]);
+  const bookmarks = useMemo(() => bookmarkMap(flow.store), [flow.store]);
+  const streak = useMemo(
+    () =>
+      computeStreaks(
+        flow.reviewLog.map((e) => dayIndex(e.atMs)),
+        dayIndex(Date.now()),
+      ).current,
+    [flow.reviewLog],
+  );
 
   const byId = useMemo(() => new Map(units.map((u) => [u.id, u])), [units]);
   const collById = useMemo(() => new Map(collections.map((c) => [c.id, c])), [collections]);
@@ -49,20 +75,23 @@ export default function TeamFlowApp({ units, collections }: { units: Unit[]; col
     progress,
     onReveal: (id) => {
       setRevealed((r) => (r[id] ? r : { ...r, [id]: true }));
-      setProgress((p) => markSeen(p, id, simDay));
+      flow.reveal(id);
     },
     onGrade: (id, g: Grade) => {
-      setProgress((p) => gradeProgress(p, id, g, simDay));
+      flow.gradeUnit(id, g);
       setRevealed((r) => ({ ...r, [id]: true }));
     },
     onSlide: (id, dir, len) =>
-      setSlides((s) => ({ ...s, [id]: Math.max(0, Math.min(len - 1, (s[id] ?? 0) + dir)) })),
-    onBookmark: (id) => setBookmarks((b) => ({ ...b, [id]: !b[id] })),
+      setSlides((s) => ({
+        ...s,
+        [id]: Math.max(0, Math.min(len - 1, (s[id] ?? 0) + dir)),
+      })),
+    onBookmark: (id) => flow.bookmark(id),
     openDetail,
   };
 
-  const due = dueUnits(units, progress, simDay);
-  const feedItems = computeFeed(units, progress, simDay, noviceOrdering);
+  const due = dueUnits(units, progress, today);
+  const feedItems = computeFeed(units, progress, today, noviceOrdering);
   const bannerVisible = showDueBanner && due.length > 0;
 
   const openHighlight = (c: Collection) => {
@@ -83,8 +112,25 @@ export default function TeamFlowApp({ units, collections }: { units: Unit[]; col
   const viewerPrev = () => setViewer((v) => (!v || v.i === 0 ? v : { ...v, i: v.i - 1 }));
 
   return (
-    <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
-      <div className="no-scrollbar" style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden' }}>
+    <div
+      style={{
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        flex: 1,
+        minHeight: 0,
+        overflow: 'hidden',
+      }}
+    >
+      <div
+        className="no-scrollbar"
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: 'auto',
+          overflowX: 'hidden',
+        }}
+      >
         {tab === 'feed' && (
           <FeedView
             units={units}
@@ -92,23 +138,22 @@ export default function TeamFlowApp({ units, collections }: { units: Unit[]; col
             feedItems={feedItems}
             actions={actions}
             progress={progress}
-            simDay={simDay}
+            today={today}
             dueCount={due.length}
             bannerVisible={bannerVisible}
+            displayName={flow.displayName}
+            streak={streak}
             onOpenDue={openDue}
             onOpenHighlight={openHighlight}
-            demo={{
-              simDay,
-              onSimDay: setSimDay,
-              showDueBanner,
-              onShowDueBanner: setShowDueBanner,
-              noviceOrdering,
-              onNoviceOrdering: setNoviceOrdering,
-            }}
+            onOpenProfile={() => setProfileOpen(true)}
           />
         )}
-        {tab === 'path' && <PathView units={units} progress={progress} revealed={revealed} openDetail={openDetail} />}
-        {tab === 'search' && <SearchView units={units} query={query} onQuery={setQuery} openDetail={openDetail} />}
+        {tab === 'path' && (
+          <PathView units={units} progress={progress} revealed={revealed} openDetail={openDetail} />
+        )}
+        {tab === 'search' && (
+          <SearchView units={units} query={query} onQuery={setQuery} openDetail={openDetail} />
+        )}
         {tab === 'saved' && <SavedView units={units} bookmarks={bookmarks} openDetail={openDetail} />}
         {tab === 'library' && (
           <LibraryView
@@ -122,7 +167,13 @@ export default function TeamFlowApp({ units, collections }: { units: Unit[]; col
         )}
       </div>
 
-      <BottomNav tab={tab} onTab={(t) => { setTab(t); setDetail(null); }} />
+      <BottomNav
+        tab={tab}
+        onTab={(t) => {
+          setTab(t);
+          setDetail(null);
+        }}
+      />
 
       {detailUnit && (
         <DetailSheet
@@ -139,10 +190,20 @@ export default function TeamFlowApp({ units, collections }: { units: Unit[]; col
           unit={viewerUnit}
           collection={collById.get(viewerUnit.collection)}
           actions={actions}
-          simDay={simDay}
+          today={today}
           onPrev={viewerPrev}
           onNext={viewerNext}
           onClose={() => setViewer(null)}
+        />
+      )}
+
+      {profileOpen && (
+        <ProfilePanel
+          units={units}
+          collections={collections}
+          flow={flow}
+          demo={demo}
+          onClose={() => setProfileOpen(false)}
         />
       )}
     </div>

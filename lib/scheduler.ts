@@ -9,7 +9,13 @@ import type { Unit } from './types';
  * legible; the UI holds it in React state (Phase 1 = local/in-memory only).
  */
 
-export const LEITNER_INTERVALS: Record<number, number> = { 1: 1, 2: 3, 3: 7, 4: 16, 5: 35 };
+export const LEITNER_INTERVALS: Record<number, number> = {
+  1: 1,
+  2: 3,
+  3: 7,
+  4: 16,
+  5: 35,
+};
 export const MAX_BOX = 5;
 
 export type Grade = 'good' | 'again';
@@ -23,7 +29,11 @@ export interface Progress {
   graded: Record<string, Grade>;
 }
 
-export const emptyProgress = (): Progress => ({ lastSeen: {}, boxes: {}, graded: {} });
+export const emptyProgress = (): Progress => ({
+  lastSeen: {},
+  boxes: {},
+  graded: {},
+});
 
 export function box(p: Progress, id: string): number {
   return p.boxes[id] ?? 1;
@@ -100,16 +110,12 @@ export function computeFeed(units: Unit[], p: Progress, simDay: number, noviceOr
   const seenStartHere = units.some((u) => u.collection === 'start-here' && seen(p, u.id));
 
   if (noviceOrdering && !seenStartHere) {
-    const start = units
-      .filter((u) => u.collection === 'start-here')
-      .sort((a, b) => a.level - b.level);
+    const start = units.filter((u) => u.collection === 'start-here').sort((a, b) => a.level - b.level);
     const rest = interleave(units.filter((u) => u.collection !== 'start-here'));
     return [...start, ...rest];
   }
 
-  const due = units
-    .filter((u) => isDue(p, u.id, simDay))
-    .sort((a, b) => (dueDay(p, a.id)! - dueDay(p, b.id)!));
+  const due = units.filter((u) => isDue(p, u.id, simDay)).sort((a, b) => dueDay(p, a.id)! - dueDay(p, b.id)!);
   const rest = interleave(units.filter((u) => !isDue(p, u.id, simDay)));
   return [...due, ...rest];
 }

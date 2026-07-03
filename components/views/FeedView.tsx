@@ -1,11 +1,11 @@
 'use client';
-import type { Unit, Collection } from '@/lib/types';
-import { tokens } from '@/lib/theme';
 import type { Progress } from '@/lib/scheduler';
-import Highlights from '../Highlights';
+import { buttonReset, tokens } from '@/lib/theme';
+import type { Collection, Unit } from '@/lib/types';
 import DueBanner from '../DueBanner';
 import FeedCard from '../FeedCard';
-import SchedulerDemo from '../SchedulerDemo';
+import Highlights from '../Highlights';
+import { initials } from '../ProfilePanel';
 import type { UnitActions } from '../UnitActions';
 
 export default function FeedView({
@@ -14,56 +14,107 @@ export default function FeedView({
   feedItems,
   actions,
   progress,
-  simDay,
+  today,
   dueCount,
   bannerVisible,
+  displayName,
+  streak,
   onOpenDue,
   onOpenHighlight,
-  demo,
+  onOpenProfile,
 }: {
   units: Unit[];
   collections: Collection[];
   feedItems: Unit[];
   actions: UnitActions;
   progress: Progress;
-  simDay: number;
+  today: number;
   dueCount: number;
   bannerVisible: boolean;
+  displayName: string;
+  /** current review streak in days; a subtle chip appears from 2 up */
+  streak: number;
   onOpenDue: () => void;
   onOpenHighlight: (c: Collection) => void;
-  demo: React.ComponentProps<typeof SchedulerDemo>;
+  onOpenProfile: () => void;
 }) {
   const byId = new Map(collections.map((c) => [c.id, c]));
-  const dayLabel = `Day ${simDay}${dueCount ? ` · ${dueCount} due` : ''}`;
 
   return (
     <div style={{ padding: '4px 0 24px' }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: '8px 18px 10px' }}>
-        <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: -0.8, color: tokens.ink }}>Team Flow</div>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '8px 18px 10px',
+        }}
+      >
         <div
           style={{
-            fontSize: 11,
-            fontWeight: 800,
-            letterSpacing: 0.6,
+            fontSize: 28,
+            fontWeight: 900,
+            letterSpacing: -0.8,
             color: tokens.ink,
-            background: tokens.sticker,
-            padding: '5px 12px',
-            borderRadius: 999,
           }}
         >
-          {dayLabel}
+          Team Flow
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {streak >= 2 && (
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: 0.5,
+                color: tokens.successInk,
+                background: tokens.successBg,
+                padding: '4px 10px',
+                borderRadius: 999,
+              }}
+            >
+              {streak}-day streak
+            </span>
+          )}
+          {/* Profile entry — replaces the static day sticker (handoff §Slice C);
+            the day count now lives inside the panel. */}
+          <button
+            type="button"
+            onClick={onOpenProfile}
+            aria-label="Open profile and settings"
+            style={{
+              ...buttonReset,
+              width: 36,
+              height: 36,
+              borderRadius: '50%',
+              background: tokens.sticker,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 13,
+              fontWeight: 900,
+              color: tokens.ink,
+            }}
+          >
+            {initials(displayName)}
+          </button>
         </div>
       </div>
 
       <Highlights collections={collections} units={units} progress={progress} onOpen={onOpenHighlight} />
 
-      <SchedulerDemo {...demo} />
-
       {bannerVisible && <DueBanner count={dueCount} onOpen={onOpenDue} />}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '14px 18px 0' }}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 14,
+          padding: '14px 18px 0',
+        }}
+      >
         {feedItems.map((u) => (
-          <FeedCard key={u.id} unit={u} collection={byId.get(u.collection)} actions={actions} simDay={simDay} />
+          <FeedCard key={u.id} unit={u} collection={byId.get(u.collection)} actions={actions} today={today} />
         ))}
       </div>
     </div>
