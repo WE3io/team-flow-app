@@ -1,15 +1,9 @@
 'use client';
 import { useMemo, useState } from 'react';
 import type { Unit, Collection } from '@/lib/types';
-import {
-  emptyProgress,
-  markSeen,
-  grade as gradeProgress,
-  computeFeed,
-  dueUnits,
-  type Grade,
-  type Progress,
-} from '@/lib/scheduler';
+import { computeFeed, dueUnits, type Grade } from '@/lib/scheduler';
+import { toSchedulerProgress, bookmarkMap, DAY_MS } from '@/lib/store';
+import { useTeamFlowStore } from '@/lib/sync';
 import BottomNav, { type TabKey } from './BottomNav';
 import FeedView from './views/FeedView';
 import PathView from './views/PathView';
@@ -20,22 +14,33 @@ import DetailSheet from './DetailSheet';
 import StoryViewer, { type ViewerState } from './StoryViewer';
 import type { UnitActions } from './UnitActions';
 
+// The Scheduler-demo control ships only when explicitly enabled (handoff §Slice
+// B) — it offsets "today" client-side to review Leitner behaviour on previews.
+const SCHEDULER_DEMO = process.env.NEXT_PUBLIC_SCHEDULER_DEMO === '1';
+
 export default function TeamFlowApp({ units, collections }: { units: Unit[]; collections: Collection[] }) {
+  const flow = useTeamFlowStore();
+
   const [tab, setTab] = useState<TabKey>('feed');
   const [revealed, setRevealed] = useState<Record<string, boolean>>({});
   const [slides, setSlides] = useState<Record<string, number>>({});
-  const [bookmarks, setBookmarks] = useState<Record<string, boolean>>({});
-  const [progress, setProgress] = useState<Progress>(emptyProgress());
   const [query, setQuery] = useState('');
   const [tierFilter, setTierFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
   const [detail, setDetail] = useState<string | null>(null);
   const [viewer, setViewer] = useState<ViewerState | null>(null);
 
-  // Scheduler demo controls (Phase 1 stand-in for real time + persistence).
-  const [simDay, setSimDay] = useState(0);
+  // Feed controls (demo-only offset gated behind the env flag).
+  const [demoOffset, setDemoOffset] = useState(0);
   const [showDueBanner, setShowDueBanner] = useState(true);
   const [noviceOrdering, setNoviceOrdering] = useState(true);
+
+  // Real time at day granularity replaces Phase-1 simDay; the demo offset (when
+  // enabled) shifts only the lens, never the stored dates.
+  const today = Math.floor(Date.now() / DAY_MS) + (SCHEDULER_DEMO ? demoOffset : 0);
+
+  const progress = useMemo(() => toSchedulerProgress(flow.store), [flow.store]);
+  const bookmarks = useMemo(() => bookmarkMap(flow.store), [flow.store]);
 
   const byId = useMemo(() => new Map(units.map((u) => [u.id, u])), [units]);
   const collById = useMemo(() => new Map(collections.map((c) => [c.id, c])), [collections]);
@@ -49,20 +54,20 @@ export default function TeamFlowApp({ units, collections }: { units: Unit[]; col
     progress,
     onReveal: (id) => {
       setRevealed((r) => (r[id] ? r : { ...r, [id]: true }));
-      setProgress((p) => markSeen(p, id, simDay));
+      flow.reveal(id);
     },
     onGrade: (id, g: Grade) => {
-      setProgress((p) => gradeProgress(p, id, g, simDay));
+      flow.gradeUnit(id, g);
       setRevealed((r) => ({ ...r, [id]: true }));
     },
     onSlide: (id, dir, len) =>
       setSlides((s) => ({ ...s, [id]: Math.max(0, Math.min(len - 1, (s[id] ?? 0) + dir)) })),
-    onBookmark: (id) => setBookmarks((b) => ({ ...b, [id]: !b[id] })),
+    onBookmark: (id) => flow.bookmark(id),
     openDetail,
   };
 
-  const due = dueUnits(units, progress, simDay);
-  const feedItems = computeFeed(units, progress, simDay, noviceOrdering);
+  const due = dueUnits(units, progress, today);
+  const feedItems = computeFeed(units, progress, today, noviceOrdering);
   const bannerVisible = showDueBanner && due.length > 0;
 
   const openHighlight = (c: Collection) => {
@@ -92,19 +97,23 @@ export default function TeamFlowApp({ units, collections }: { units: Unit[]; col
             feedItems={feedItems}
             actions={actions}
             progress={progress}
-            simDay={simDay}
+            today={today}
             dueCount={due.length}
             bannerVisible={bannerVisible}
             onOpenDue={openDue}
             onOpenHighlight={openHighlight}
-            demo={{
-              simDay,
-              onSimDay: setSimDay,
-              showDueBanner,
-              onShowDueBanner: setShowDueBanner,
-              noviceOrdering,
-              onNoviceOrdering: setNoviceOrdering,
-            }}
+            demo={
+              SCHEDULER_DEMO
+                ? {
+                    demoOffset,
+                    onDemoOffset: setDemoOffset,
+                    showDueBanner,
+                    onShowDueBanner: setShowDueBanner,
+                    noviceOrdering,
+                    onNoviceOrdering: setNoviceOrdering,
+                  }
+                : null
+            }
           />
         )}
         {tab === 'path' && <PathView units={units} progress={progress} revealed={revealed} openDetail={openDetail} />}
@@ -139,7 +148,7 @@ export default function TeamFlowApp({ units, collections }: { units: Unit[]; col
           unit={viewerUnit}
           collection={collById.get(viewerUnit.collection)}
           actions={actions}
-          simDay={simDay}
+          today={today}
           onPrev={viewerPrev}
           onNext={viewerNext}
           onClose={() => setViewer(null)}

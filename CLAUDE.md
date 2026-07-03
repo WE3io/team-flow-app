@@ -11,9 +11,16 @@ governance, **binding** — esp. §6) and `Platform_Build_Handoff_for_Claude_Cod
 
 Phase 1 (rendering MVP) is live at https://team-flow-app-lilac.vercel.app —
 pushes to `main` auto-deploy production; branches get Vercel previews.
-Phase 2 work (persistence via Neon Postgres, responsive shell, profile,
-gamification) is specified in **`PHASE2_HANDOFF.md`** — read it before
-touching Phase 2 scope. Quizzing (Phase 3) is still out of scope.
+Phase 2 work is specified in **`PHASE2_HANDOFF.md`** — read it before touching
+Phase 2 scope. Done so far: slice A (responsive shell — phone frame removed,
+centred 768px column) and slice B (persistence — Prisma + Postgres, local-first
+sync, pairing codes, real-date scheduling). Slices C (profile/settings) and
+D (gamification) remain. Quizzing (Phase 3) is still out of scope.
+
+Persistence is **optional at runtime**: without `DATABASE_URL` the app runs
+local-first (localStorage only) and API routes return 503 `no-persistence`.
+Deploys need the Neon connection strings in Vercel env (see `.env.example`)
+plus `prisma migrate deploy` in the build once a database exists.
 
 ## Stack
 
@@ -36,7 +43,9 @@ a dark "instrument" moment. Yellow day sticker is the one playful wink.
 ## Layout
 
 ```
-app/                 Next routes (server page loads content → client app) + /api/health
+app/                 Next routes (server page loads content → client app).
+  api/               health + persistence: user (create/get/name/reset),
+                     progress (write-through sync), pair (generate/claim).
 components/          UI. TeamFlowApp = client orchestrator holding all state.
   RevealBlock.tsx    Shared tap-to-reveal / grade / carousel / reel (§6a).
   views/             Feed, Path, Search, Saved, Library.
@@ -46,8 +55,15 @@ lib/
   content.ts         Server-only cached wrapper.
   collections.ts     Collection colour/letter identity.
   scheduler.ts       Leitner boxes + interleave + novice rule + path (§6b).
+                     Governance — pure day-index rules; do not change them.
+  store.ts           Local-first progress store (real dates ↔ day-index) +
+                     wire format + most-recent-lastSeenAt merge.
+  sync.ts            useTeamFlowStore(): localStorage persistence, debounced
+                     write-through sync, pairing client.
+  db.ts              Guarded Prisma singleton (null without DATABASE_URL).
   query.ts           Search + library filters.
   theme.ts           Tokens, type styles, tier labels.
+prisma/              schema.prisma (User/UnitProgress/ReviewEvent) + migrations.
 content/units/*.mdx  Generated content (do not hand-edit; re-run migrate:seed).
 content/collections.json
 scripts/             migrate-seed.ts, validate-content.ts
@@ -61,6 +77,8 @@ npm run build             # prod build (validates content — fails on bad units
 npm run typecheck         # tsc --noEmit
 npm run validate:content  # standalone content gate (for CI)
 npm run migrate:seed      # regenerate content/ from the seed
+npm run db:migrate        # prisma migrate dev (needs .env; see .env.example)
+npm run db:deploy         # prisma migrate deploy (production/CI)
 ```
 
 ## Non-negotiable learning features (seed §6 — do not drop)
@@ -68,8 +86,10 @@ npm run migrate:seed      # regenerate content/ from the seed
 1. **Question-first / tap-to-reveal** is the default card interaction. Units
    with a `prompt` show it before the `answer`; others use hook→body reveal.
 2. **Spacing scheduler** (Leitner boxes 1/3/7/16/35 days). "Got it" promotes a
-   box, "Not yet" resets to box 1; the feed prioritises due units. Phase 1 uses
-   a simulated day (Scheduler-demo control on the Feed) in place of real time.
+   box, "Not yet" resets to box 1; the feed prioritises due units. Scheduling
+   runs on real dates at day granularity; `NEXT_PUBLIC_SCHEDULER_DEMO=1`
+   re-enables the Scheduler-demo control (a client-side "jump ahead" lens for
+   reviewing previews — stored dates are never changed).
 3. **Interleave** the feed (mix types/topics), with the novice exception
    (brand-new users get Start Here level-1 in order first).
 4. **Prohibitions:** never tag/route by "learning style"; visuals carry

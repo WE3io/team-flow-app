@@ -9,16 +9,16 @@ export default function FeedCard({
   unit,
   collection,
   actions,
-  simDay,
+  today,
 }: {
   unit: Unit;
   collection?: Collection;
   actions: UnitActions;
-  simDay: number;
+  today: number;
 }) {
   const ts = typeStyle(unit.type);
   const collColor = collection?.color ?? tokens.ink;
-  const due = isDue(actions.progress, unit.id, simDay);
+  const due = isDue(actions.progress, unit.id, today);
   const bookmarked = !!actions.bookmarks[unit.id];
 
   return (

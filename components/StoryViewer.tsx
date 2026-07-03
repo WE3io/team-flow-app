@@ -20,7 +20,7 @@ export default function StoryViewer({
   unit,
   collection,
   actions,
-  simDay,
+  today,
   onPrev,
   onNext,
   onClose,
@@ -29,14 +29,14 @@ export default function StoryViewer({
   unit: Unit;
   collection?: Collection;
   actions: UnitActions;
-  simDay: number;
+  today: number;
   onPrev: () => void;
   onNext: () => void;
   onClose: () => void;
 }) {
   const ts = typeStyle(unit.type);
   const collColor = collection?.color ?? tokens.ink;
-  const due = isDue(actions.progress, unit.id, simDay);
+  const due = isDue(actions.progress, unit.id, today);
   const isLast = viewer.i >= viewer.ids.length - 1;
 
   return (

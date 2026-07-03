@@ -5,7 +5,7 @@ import type { Progress } from '@/lib/scheduler';
 import Highlights from '../Highlights';
 import DueBanner from '../DueBanner';
 import FeedCard from '../FeedCard';
-import SchedulerDemo from '../SchedulerDemo';
+import SchedulerDemo, { type SchedulerDemoProps } from '../SchedulerDemo';
 import type { UnitActions } from '../UnitActions';
 
 export default function FeedView({
@@ -14,7 +14,7 @@ export default function FeedView({
   feedItems,
   actions,
   progress,
-  simDay,
+  today,
   dueCount,
   bannerVisible,
   onOpenDue,
@@ -26,15 +26,15 @@ export default function FeedView({
   feedItems: Unit[];
   actions: UnitActions;
   progress: Progress;
-  simDay: number;
+  today: number;
   dueCount: number;
   bannerVisible: boolean;
   onOpenDue: () => void;
   onOpenHighlight: (c: Collection) => void;
-  demo: React.ComponentProps<typeof SchedulerDemo>;
+  demo: SchedulerDemoProps | null;
 }) {
   const byId = new Map(collections.map((c) => [c.id, c]));
-  const dayLabel = `Day ${simDay}${dueCount ? ` · ${dueCount} due` : ''}`;
+  const dayLabel = dueCount ? `${dueCount} due` : 'Up to date';
 
   return (
     <div style={{ padding: '4px 0 24px' }}>
@@ -57,13 +57,13 @@ export default function FeedView({
 
       <Highlights collections={collections} units={units} progress={progress} onOpen={onOpenHighlight} />
 
-      <SchedulerDemo {...demo} />
+      {demo && <SchedulerDemo {...demo} />}
 
       {bannerVisible && <DueBanner count={dueCount} onOpen={onOpenDue} />}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '14px 18px 0' }}>
         {feedItems.map((u) => (
-          <FeedCard key={u.id} unit={u} collection={byId.get(u.collection)} actions={actions} simDay={simDay} />
+          <FeedCard key={u.id} unit={u} collection={byId.get(u.collection)} actions={actions} today={today} />
         ))}
       </div>
     </div>

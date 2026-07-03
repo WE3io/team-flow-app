@@ -2,26 +2,29 @@
 import { useState } from 'react';
 import { tokens } from '@/lib/theme';
 
-/**
- * Phase-1 demo control for the spacing scheduler (handoff §6b). In Phase 2 the
- * simulated day is replaced by real elapsed time + persistence; here it lets a
- * reviewer advance "time" and watch the Leitner due queue resurface cards.
- */
-export default function SchedulerDemo({
-  simDay,
-  onSimDay,
-  showDueBanner,
-  onShowDueBanner,
-  noviceOrdering,
-  onNoviceOrdering,
-}: {
-  simDay: number;
-  onSimDay: (v: number) => void;
+export interface SchedulerDemoProps {
+  demoOffset: number;
+  onDemoOffset: (v: number) => void;
   showDueBanner: boolean;
   onShowDueBanner: (v: boolean) => void;
   noviceOrdering: boolean;
   onNoviceOrdering: (v: boolean) => void;
-}) {
+}
+
+/**
+ * Demo control for the spacing scheduler (handoff §6b / §Slice B). Scheduling
+ * now runs on real dates; this offsets "today" forward *client-side only* so a
+ * reviewer can watch the Leitner due queue resurface cards without waiting days.
+ * Gated behind NEXT_PUBLIC_SCHEDULER_DEMO=1, so it never ships to production.
+ */
+export default function SchedulerDemo({
+  demoOffset,
+  onDemoOffset,
+  showDueBanner,
+  onShowDueBanner,
+  noviceOrdering,
+  onNoviceOrdering,
+}: SchedulerDemoProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -59,20 +62,22 @@ export default function SchedulerDemo({
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: 12, fontWeight: 700, color: tokens.ink }}>Simulated day</span>
-              <span style={{ fontSize: 12, fontWeight: 800, color: tokens.success }}>Day {simDay}</span>
+              <span style={{ fontSize: 12, fontWeight: 700, color: tokens.ink }}>Jump ahead</span>
+              <span style={{ fontSize: 12, fontWeight: 800, color: tokens.success }}>
+                {demoOffset === 0 ? 'Today' : `Today +${demoOffset}d`}
+              </span>
             </div>
             <input
               type="range"
               min={0}
               max={40}
               step={1}
-              value={simDay}
-              onChange={(e) => onSimDay(Number(e.target.value))}
+              value={demoOffset}
+              onChange={(e) => onDemoOffset(Number(e.target.value))}
               style={{ width: '100%', accentColor: tokens.success }}
             />
             <span style={{ fontSize: 11, color: tokens.text3, lineHeight: 1.4 }}>
-              Grade a card “Got it / Not yet”, then drag to a later day to see it resurface via the daily-review banner.
+              Grade a card “Got it / Not yet”, then jump ahead to see it resurface via the daily-review banner. Offsets the view only — real dates are still stored.
             </span>
           </div>
 
