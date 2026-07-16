@@ -7,10 +7,11 @@ export const dynamic = 'force-dynamic';
 const EVENT_WINDOW_DAYS = 90;
 
 /** Pull server state for a user (initial sync / after adopting via pairing). */
-export async function GET(_req: Request, { params }: { params: { id: string } }) {
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   if (!prisma) return NextResponse.json({ error: 'no-persistence' }, { status: 503 });
+  const { id } = await params;
   const user = await prisma.user.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: { progress: true },
   });
   if (!user) return NextResponse.json({ error: 'not-found' }, { status: 404 });

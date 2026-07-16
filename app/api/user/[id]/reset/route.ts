@@ -5,9 +5,9 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 /** Reset a user's progress (keeps identity — handoff §Slice C settings). */
-export async function POST(_req: Request, { params }: { params: { id: string } }) {
+export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   if (!prisma) return NextResponse.json({ error: 'no-persistence' }, { status: 503 });
-  const userId = params.id;
+  const userId = (await params).id;
   await prisma.$transaction([
     prisma.unitProgress.deleteMany({ where: { userId } }),
     prisma.reviewEvent.deleteMany({ where: { userId } }),
