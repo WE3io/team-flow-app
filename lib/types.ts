@@ -78,6 +78,8 @@ export type UnitType = (typeof UNIT_TYPES)[number];
 export type Tier = (typeof TIERS)[number];
 export type Format = (typeof FORMATS)[number];
 export type DeployClass = (typeof DEPLOY_CLASSES)[number];
+/** A learner's deploy-class filter: a class, or 'all' (no filtering). */
+export type DeployClassPref = DeployClass | 'all';
 export type Level = 1 | 2 | 3;
 export type CarouselSlide = z.infer<typeof CarouselSlideSchema>;
 export type Unit = z.infer<typeof UnitSchema>;

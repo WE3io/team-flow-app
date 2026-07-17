@@ -13,6 +13,7 @@ import {
   toggleBookmark as toggleBookmarkStore,
   toRows,
 } from './store';
+import type { DeployClassPref } from './types';
 
 /**
  * Local-first store + write-through sync (PHASE2_HANDOFF §Slice B).
@@ -29,6 +30,10 @@ const K_STORE = 'tf.progress';
 const K_EVENTS = 'tf.events';
 const K_STARTED = 'tf.startedAt';
 const K_LOG = 'tf.reviewLog';
+const K_CLASS = 'tf.deployClass';
+
+const DEPLOY_PREFS: DeployClassPref[] = ['all', 'container-image', 'managed-source'];
+const isDeployPref = (v: unknown): v is DeployClassPref => DEPLOY_PREFS.includes(v as DeployClassPref);
 // Local review history for streaks + weekly recap (slice D). Bounded — old
 // entries age out of the metrics windows anyway.
 const LOG_CAP = 1000;
@@ -104,6 +109,9 @@ export interface TeamFlowStore {
   gradeUnit: (id: string, g: Grade) => void;
   bookmark: (id: string) => void;
   setDisplayName: (name: string) => void;
+  /** Deploy-class filter — hides the other class's deployment lessons. Local-only. */
+  deployClass: DeployClassPref;
+  setDeployClass: (v: DeployClassPref) => void;
   resetProgress: () => Promise<void>;
   pairGenerate: () => Promise<{ code: string; expiresAt: string } | null>;
   pairClaim: (code: string) => Promise<'ok' | 'invalid' | 'error'>;
@@ -116,6 +124,7 @@ export function useTeamFlowStore(): TeamFlowStore {
   const [sync, setSync] = useState<SyncState>('local');
   const [startedAtMs, setStartedAtMs] = useState(0);
   const [reviewLog, setReviewLogState] = useState<ReviewLogEntry[]>([]);
+  const [deployClass, setDeployClassState] = useState<DeployClassPref>('all');
 
   // Refs mirror latest state for use inside async callbacks without stale closures.
   const storeRef = useRef(store);
@@ -146,6 +155,12 @@ export function useTeamFlowStore(): TeamFlowStore {
   const setName = useCallback((name: string) => {
     setDisplayNameState(name);
     lsSet(K_NAME, name);
+  }, []);
+
+  // Deploy-class preference is a local render filter (no server column yet).
+  const setDeployClass = useCallback((v: DeployClassPref) => {
+    setDeployClassState(v);
+    lsSet(K_CLASS, v);
   }, []);
 
   const ensureUser = useCallback(
@@ -330,6 +345,8 @@ export function useTeamFlowStore(): TeamFlowStore {
       setUserId(savedId);
     }
     if (savedName) setDisplayNameState(savedName);
+    const savedClass = lsGet(K_CLASS);
+    if (isDeployPref(savedClass)) setDeployClassState(savedClass);
     // First-visit stamp for the profile's "Day N" count.
     const started = Number(lsGet(K_STARTED)) || Date.now();
     lsSet(K_STARTED, String(started));
@@ -393,6 +410,8 @@ export function useTeamFlowStore(): TeamFlowStore {
     gradeUnit,
     bookmark,
     setDisplayName,
+    deployClass,
+    setDeployClass,
     resetProgress,
     pairGenerate,
     pairClaim,
