@@ -5,8 +5,9 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 /** Rename a user (leaderboard display name — handoff §Slice C). */
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   if (!prisma) return NextResponse.json({ error: 'no-persistence' }, { status: 503 });
+  const { id } = await params;
   let displayName: string | undefined;
   try {
     ({ displayName } = await req.json());
@@ -17,7 +18,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   if (!name) return NextResponse.json({ error: 'bad-request' }, { status: 400 });
   try {
     const user = await prisma.user.update({
-      where: { id: params.id },
+      where: { id },
       data: { displayName: name },
     });
     return NextResponse.json({ id: user.id, displayName: user.displayName });
