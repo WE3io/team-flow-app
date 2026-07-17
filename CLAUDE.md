@@ -1,11 +1,13 @@
-# Team Flow — internal learning platform
+# Team Flow — a snackable workflow-learning platform
 
-Mobile-first, "snackable" learning app that teaches our team the Git /
-trunk-based / AI-assisted workflow. Content is authored once in the seed and
-rendered into Instagram-style primitives (feed, carousels, stories, reels,
-highlights, saved). See `Team_Workflow_Learning_Seed_v0.3.md` (content + design
-governance, **binding** — esp. §6) and `Platform_Build_Handoff_for_Claude_Code.md`
-(build spec).
+Mobile-first, "snackable" learning app that teaches a team the Git /
+trunk-based / AI-assisted workflow. The content is **generic — any team can run
+it** — and branches only by **deploy class** (`container-image` / `managed-source`;
+a unit's `appliesTo` names which it's relevant to). Content is authored once in
+the seed and rendered into Instagram-style primitives (feed, carousels, stories,
+reels, highlights, saved). See `Team_Workflow_Learning_Seed_v0.3.md` (content +
+design governance, **binding** — esp. §6) and
+`Platform_Build_Handoff_for_Claude_Code.md` (build spec).
 
 ## Status: Phase 1 complete + deployed; Phase 2 in progress
 
@@ -27,8 +29,9 @@ plus `prisma migrate deploy` in the build once a database exists.
 
 ## Stack
 
-- **Next.js (App Router) + TypeScript**, `output: 'standalone'` (single Coolify
-  container, one health check — unit `eng-coolify-singleimage`).
+- **Next.js (App Router) + TypeScript**, `output: 'standalone'` (single
+  container + one health check for the container-image deploy class — unit
+  `eng-coolify-singleimage`).
 - **Tailwind CSS** for scaffolding; the design system lives in `lib/theme.ts`
   (tokens) + inline styles for pixel fidelity to the approved prototype.
 - **Content:** one `content/units/<id>.mdx` per unit (YAML frontmatter matching
