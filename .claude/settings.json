@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "[ -d node_modules ] || npm ci --no-audit --no-fund",
+            "command": "[ -d node_modules ] || COREPACK_ENABLE_DOWNLOAD_PROMPT=0 corepack pnpm install --frozen-lockfile",
             "timeout": 300
           }
         ]
