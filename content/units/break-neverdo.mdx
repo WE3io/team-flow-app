@@ -40,4 +40,4 @@ misconception: >-
   it."
 ---
 
-Pasting a Git error into an AI and running whatever it suggests is dangerous, because AIs readily suggest history-rewriting commands. `git reset --hard` permanently deletes changes; `git push --force` can wipe teammates' work off the shared branch. We've disabled force-push on protected branches so the worst can't happen by accident — but the habit still matters. Safe, reversible options exist (undo *with* a new change, set work aside, make a backup branch), and an engineer will pick the right one in seconds. When in doubt: ask, don't run.
+Pasting a Git error into an AI and running whatever it suggests is dangerous, because AIs readily suggest history-rewriting commands. `git reset --hard` permanently deletes changes; `git push --force` can wipe teammates' work off the shared branch. Force-push should be disabled on protected branches; where it is, the worst can't happen by accident — but the habit still matters. Safe, reversible options exist (undo *with* a new change, set work aside, make a backup branch), and an engineer will pick the right one in seconds. When in doubt: ask, don't run.

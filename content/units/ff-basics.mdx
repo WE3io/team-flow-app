@@ -1,6 +1,6 @@
 ---
 id: ff-basics
-title: 'What a feature flag is, and our one rule'
+title: 'What a feature flag is, and the one rule'
 type: concept
 tier: product-design
 level: 3
@@ -19,4 +19,4 @@ visual: 'A labelled toggle, "on for 10% of users."'
 next: '`ff-knight`.'
 ---
 
-Feature flags let us merge unfinished work safely (hidden behind an "off" switch) and turn features on for some users, or off instantly if something's wrong (a "kill switch"). We use Unleash for this. Our one discipline: **one flag, one purpose, and delete it the moment the rollout is done.** Old flags left lying around are how accidents happen.
+Feature flags let a team merge unfinished work safely (hidden behind an "off" switch) and turn features on for some users, or off instantly if something's wrong (a "kill switch"). Use a flag service (e.g. Unleash, LaunchDarkly). The discipline that matters: **one flag, one purpose, and delete it the moment the rollout is done.** Old flags left lying around are how accidents happen.

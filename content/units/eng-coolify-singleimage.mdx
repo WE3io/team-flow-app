@@ -1,12 +1,12 @@
 ---
 id: eng-coolify-singleimage
-title: 'One app, one container, one health check'
+title: The container-host shape
 type: decision
 tier: engineer
 level: 3
 topics:
   - deploy
-  - coolify
+  - container-image
   - zero-downtime
 format: card
 collection: engineers
@@ -14,17 +14,14 @@ prereqs:
   - eng-ghcr
 related:
   - eng-pipeline
+appliesTo:
+  - container-image
 order: 21
 hook: >-
-  Coolify's zero-downtime deploys only work if you follow one shape. Break it
-  and you get outages.
-visual: ✅ single container + health check vs ⛔ compose blob + port map.
-next: |-
-  `eng-pipeline`.
-
-  ---
-
-  ### Collection: Non-Code & Design Work
+  On an image-pull host, zero-downtime deploys only work if you follow one
+  shape. Break it and you get outages.
+visual: ✅ single container + health check vs ⛔ multi-service blob + host port map.
+next: '`eng-pipeline`.'
 ---
 
-Rolling (zero-downtime) updates in Coolify require a single image built from a Dockerfile, a passing health-check endpoint, and the default container naming. They **break** with multi-service Docker Compose deployments and with host port mappings (which disable the health check). So: one deployable app = one container with a real `/health` route, default naming, no port mapping. Keep Postgres, Redis and Unleash as *separate* Coolify resources — which also stops an app deploy needlessly restarting your database.
+For image-pull hosts (e.g. Coolify, Render, Fly), rolling zero-downtime updates require a single image, a passing health-check endpoint, and the default container naming. They **break** with multi-service Compose deployments and with host port mappings (which disable the health check). So: one deployable app = one container with a real `/health` route, default naming, no host port map. Keep stateful services (Postgres, Redis, a flag service) as *separate* resources — which also stops an app deploy needlessly restarting the database. Note: self-orchestrated platforms (Kubernetes, Docker Compose, ECS/Nomad) follow the same build-once-scan-pull principle but adapt the runtime specifics — pods/services/ingress, and port mapping is normal there — so this single-container/no-port-map shape is the image-pull-host case, not universal to all container deploys.

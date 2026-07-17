@@ -1,0 +1,34 @@
+---
+id: eng-managed-source
+title: Managed-source deploys
+type: concept
+tier: engineer
+level: 3
+topics:
+  - deploy
+  - managed-source
+  - ci
+format: card
+collection: engineers
+prereqs:
+  - eng-pipeline
+related:
+  - eng-pipeline
+appliesTo:
+  - managed-source
+order: 22
+hook: >-
+  On a managed-source platform the platform builds from the repo — so pin your
+  inputs and scan the source, because there's no image you control.
+visual: >-
+  Repo → platform builds → preview per PR, prod on merge. Scan source + deps;
+  pin the preset.
+next: |-
+  That's the managed-source back half of `eng-pipeline`.
+
+  ---
+
+  ### Collection: Non-Code & Design Work
+---
+
+The platform builds and deploys straight from the repo (e.g. Vercel, Netlify, Cloudflare Pages), and previews plus trunk→prod are automatic — a preview per PR, production on merge. Two consequences. Pin your build inputs for reproducibility — runtime and framework versions and build config ("framework preset" is one platform's term) — so a build is the same next month as it is today. And scan **source + dependencies** rather than an image, because there is no image artefact you control; a committed lockfile plus dependency and secret scanning is the equivalent of image scanning here.

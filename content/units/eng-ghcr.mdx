@@ -14,12 +14,14 @@ prereqs:
   - eng-pipeline
 related:
   - eng-coolify-singleimage
+appliesTo:
+  - container-image
 order: 20
 hook: >-
-  Build in CI and have Coolify *pull* the image — don't build on the production
-  box.
-visual: Actions → scan → GHCR → Coolify pull. Build never touches the prod server.
+  Build the image once in CI and have the host *pull* it — never build on the
+  production box.
+visual: CI → scan → registry → host pulls. Build never touches the production box.
 next: '`eng-coolify-singleimage`.'
 ---
 
-GitHub Packages is GHCR. We build the image in GitHub Actions, scan it, push it to `ghcr.io`, and Coolify deploys by pulling that prebuilt image. Two reasons: you scan the exact artefact you ship (rebuilding on the server would ship something you didn't scan), and you keep heavy build load off the VPS (builds can and do crash small boxes). One-time setup gotcha: the server needs `docker login ghcr.io` with a PAT to pull private images, or the pull fails with `unauthorized`.
+The principle: CI builds the image, scans the artefact you're about to ship, pushes it to a registry, and the host pulls that exact image. Two reasons: you scan the exact artefact you ship (rebuilding on the server would ship something you didn't scan), and you keep heavy build load off the production box (builds can and do crash small servers). Example detail: with GitHub Actions the registry is often GHCR (`ghcr.io`); a private image needs a one-time `docker login` on the host, or the pull fails with `unauthorized`.

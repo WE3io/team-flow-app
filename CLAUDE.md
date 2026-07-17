@@ -3,7 +3,7 @@
 Mobile-first, "snackable" learning app that teaches our team the Git /
 trunk-based / AI-assisted workflow. Content is authored once in the seed and
 rendered into Instagram-style primitives (feed, carousels, stories, reels,
-highlights, saved). See `Team_Workflow_Learning_Seed_v0.2.md` (content + design
+highlights, saved). See `Team_Workflow_Learning_Seed_v0.3.md` (content + design
 governance, **binding** — esp. §6) and `Platform_Build_Handoff_for_Claude_Code.md`
 (build spec).
 

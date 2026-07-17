@@ -14,6 +14,7 @@ prereqs: []
 related:
   - eng-ghcr
   - eng-coolify-singleimage
+  - eng-managed-source
   - ai-format-lint-security
 order: 19
 hook: >-
@@ -21,20 +22,21 @@ hook: >-
   green.
 carousel:
   - heading: Lint & format
-    body: Biome or ESLint/Prettier. Style and obvious bugs.
+    body: '(e.g. Biome, or ESLint + Prettier) — style and obvious bugs.'
   - heading: Type-check
-    body: '`tsc`. No type errors reach `main`.'
+    body: (e.g. `tsc`) — no type errors reach `main`.
   - heading: Test
-    body: 'Vitest for units/components, Playwright for end-to-end.'
-  - heading: Build image
-    body: one Dockerfile per deployable app.
-  - heading: Scan image
-    body: 'Trivy: vulnerabilities, secrets, dependencies. Block on criticals.'
-  - heading: Push to GHCR
-    body: 'the scanned artefact, tagged.'
-  - heading: Deploy
-    body: trigger Coolify to pull that exact image. Never before the checks pass.
-visual: 'A seven-stage pipeline, each stage gating the next.'
-next: '`eng-ghcr`.'
+    body: '(e.g. Vitest for units/components, Playwright for end-to-end).'
+  - heading: Verify
+    body: all checks green is the gate to merge. Red means stop.
+  - heading: Build & deploy
+    body: >-
+      the back half varies by deploy class: *container-image* builds and scans
+      an image the host pulls; *managed-source* lets the platform build from the
+      repo. See your deploy-class unit.
+visual: 'A gated pipeline — shared checks, then a class-specific build/deploy tail.'
+next: >-
+  Your deploy-class unit — `eng-ghcr` + `eng-coolify-singleimage`
+  (container-image), or `eng-managed-source` (managed-source).
 ---
 
