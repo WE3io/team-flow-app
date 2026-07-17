@@ -1,5 +1,6 @@
 'use client';
 import { useMemo, useState } from 'react';
+import { visibleForClass } from '@/lib/query';
 import { computeFeed, dueUnits, type Grade } from '@/lib/scheduler';
 import { computeStreaks } from '@/lib/stats';
 import { bookmarkMap, DAY_MS, dayIndex, toSchedulerProgress } from '@/lib/store';
@@ -90,12 +91,17 @@ export default function TeamFlowApp({ units, collections }: { units: Unit[]; col
     openDetail,
   };
 
-  const due = dueUnits(units, progress, today);
-  const feedItems = computeFeed(units, progress, today, noviceOrdering);
+  // Deploy-class filter: hide the other class's deployment lessons from the
+  // discovery surfaces (feed/path/search/library/highlights). Saved and id
+  // lookup keep the full set so explicit bookmarks and links always resolve.
+  const visibleUnits = useMemo(() => visibleForClass(units, flow.deployClass), [units, flow.deployClass]);
+
+  const due = dueUnits(visibleUnits, progress, today);
+  const feedItems = computeFeed(visibleUnits, progress, today, noviceOrdering);
   const bannerVisible = showDueBanner && due.length > 0;
 
   const openHighlight = (c: Collection) => {
-    const ids = units.filter((u) => u.collection === c.id).map((u) => u.id);
+    const ids = visibleUnits.filter((u) => u.collection === c.id).map((u) => u.id);
     setViewer({ ids, i: 0, title: c.title });
   };
   const openDue = () => setViewer({ ids: due.map((u) => u.id), i: 0, title: 'Due today' });
@@ -133,7 +139,7 @@ export default function TeamFlowApp({ units, collections }: { units: Unit[]; col
       >
         {tab === 'feed' && (
           <FeedView
-            units={units}
+            units={visibleUnits}
             collections={collections}
             feedItems={feedItems}
             actions={actions}
@@ -149,15 +155,15 @@ export default function TeamFlowApp({ units, collections }: { units: Unit[]; col
           />
         )}
         {tab === 'path' && (
-          <PathView units={units} progress={progress} revealed={revealed} openDetail={openDetail} />
+          <PathView units={visibleUnits} progress={progress} revealed={revealed} openDetail={openDetail} />
         )}
         {tab === 'search' && (
-          <SearchView units={units} query={query} onQuery={setQuery} openDetail={openDetail} />
+          <SearchView units={visibleUnits} query={query} onQuery={setQuery} openDetail={openDetail} />
         )}
         {tab === 'saved' && <SavedView units={units} bookmarks={bookmarks} openDetail={openDetail} />}
         {tab === 'library' && (
           <LibraryView
-            units={units}
+            units={visibleUnits}
             tierFilter={tierFilter}
             typeFilter={typeFilter}
             onTier={setTierFilter}
@@ -199,7 +205,7 @@ export default function TeamFlowApp({ units, collections }: { units: Unit[]; col
 
       {profileOpen && (
         <ProfilePanel
-          units={units}
+          units={visibleUnits}
           collections={collections}
           flow={flow}
           demo={demo}

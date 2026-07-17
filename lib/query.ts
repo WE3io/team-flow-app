@@ -1,4 +1,15 @@
-import type { Unit } from './types';
+import type { DeployClassPref, Unit } from './types';
+
+/**
+ * Deploy-class relevance filter (seed §3). A unit shows when the pref is 'all',
+ * or the unit is universal (no `appliesTo`), or its `appliesTo` includes the
+ * chosen class. This is relevance-by-deployment-context — never the
+ * seed-prohibited "learning style" routing.
+ */
+export function visibleForClass(units: Unit[], pref: DeployClassPref): Unit[] {
+  if (pref === 'all') return units;
+  return units.filter((u) => !u.appliesTo?.length || u.appliesTo.includes(pref));
+}
 
 /**
  * Search — "lookup under stress" (handoff §5.3, acceptance §9.3). Matches

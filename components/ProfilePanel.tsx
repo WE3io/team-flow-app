@@ -5,7 +5,7 @@ import { computeBadges, computeRecap, computeStreaks, MASTERED_BOX } from '@/lib
 import { DAY_MS, dayIndex, isSeen } from '@/lib/store';
 import type { TeamFlowStore } from '@/lib/sync';
 import { buttonReset, tokens } from '@/lib/theme';
-import type { Collection, Unit } from '@/lib/types';
+import type { Collection, DeployClassPref, Unit } from '@/lib/types';
 import SchedulerDemo, { type SchedulerDemoProps } from './SchedulerDemo';
 import { renderShareCard, shareOrDownload } from './shareCard';
 
@@ -371,6 +371,10 @@ export default function ProfilePanel({
         <SectionLabel>Devices</SectionLabel>
         <PairingSection flow={flow} />
 
+        {/* Deploy class — filters deployment lessons to the team's stack */}
+        <SectionLabel>Your deploy setup</SectionLabel>
+        <DeployClassSection flow={flow} />
+
         {/* Settings */}
         <SectionLabel>Settings</SectionLabel>
         {demo && (
@@ -645,6 +649,42 @@ function PairingSection({ flow }: { flow: TeamFlowStore }) {
         </button>
       </div>
       {claimNote && <p style={{ fontSize: 11, color: tokens.text4, margin: '8px 0 0' }}>{claimNote}</p>}
+    </Card>
+  );
+}
+
+function DeployClassSection({ flow }: { flow: TeamFlowStore }) {
+  const opts: { value: DeployClassPref; label: string; hint: string }[] = [
+    { value: 'all', label: 'Show all', hint: 'both classes' },
+    { value: 'container-image', label: 'Container-image', hint: 'CI builds an image, the host pulls it' },
+    { value: 'managed-source', label: 'Managed-source', hint: 'the platform builds from the repo' },
+  ];
+  const current = opts.find((o) => o.value === flow.deployClass) ?? opts[0];
+  return (
+    <Card>
+      <div style={{ fontSize: 13, fontWeight: 800, color: tokens.ink, marginBottom: 8 }}>
+        How does your team deploy?
+      </div>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        {opts.map((o) => {
+          const active = flow.deployClass === o.value;
+          return (
+            <button
+              key={o.value}
+              type="button"
+              onClick={() => flow.setDeployClass(o.value)}
+              aria-pressed={active}
+              style={{ ...(active ? primaryBtn : secondaryBtn), flex: '1 1 30%' }}
+            >
+              {o.label}
+            </button>
+          );
+        })}
+      </div>
+      <p style={{ fontSize: 11, color: tokens.text4, margin: '10px 0 0', lineHeight: 1.4 }}>
+        Filters the deployment lessons to how your team ships ({current.hint}). Everything else is shown to
+        everyone.
+      </p>
     </Card>
   );
 }

@@ -1,7 +1,7 @@
 /**
  * migrate-seed.ts — one-off migration (handoff §4).
  *
- * Parses Team_Workflow_Learning_Seed_v0.2.md (the content source of truth) and
+ * Parses Team_Workflow_Learning_Seed_v0.3.md (the content source of truth) and
  * emits one content/units/<id>.mdx per unit with YAML frontmatter matching the
  * `Unit` type, plus content/collections.json from seed §4. Every unit is
  * validated against the zod schema; invalid or duplicate ids abort the run.
@@ -16,7 +16,7 @@ import yaml from 'js-yaml';
 import { CollectionSchema, type Unit, UnitSchema } from '../lib/types';
 
 const ROOT = path.resolve(__dirname, '..');
-const SEED = path.join(ROOT, 'Team_Workflow_Learning_Seed_v0.2.md');
+const SEED = path.join(ROOT, 'Team_Workflow_Learning_Seed_v0.3.md');
 const UNITS_DIR = path.join(ROOT, 'content', 'units');
 const COLLECTIONS_OUT = path.join(ROOT, 'content', 'collections.json');
 
